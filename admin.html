@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Jan Novák Blog</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0a0b;--surface:#16161a;--surface2:#1e1e24;--border:rgba(255,255,255,0.08);
+    --accent:#c8a96e;--accent2:#e8c98e;--text:#e8e6e0;--muted:#6b6860;
+    --danger:#c85a5a;--success:#5ac87a;
+    --serif:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;font-weight:300;line-height:1.6;min-height:100vh}
+  #root{display:flex;min-height:100vh}
+
+  .sidebar{width:240px;background:var(--surface);border-right:1px solid var(--border);padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem;position:fixed;top:0;bottom:0;left:0;overflow-y:auto}
+  .sidebar-logo{font-family:var(--serif);font-size:1.4rem;font-weight:600;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:1.5rem}
+  .sidebar-logo span{color:var(--accent)}
+  .sidebar-label{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-bottom:0.8rem}
+  .sidebar-nav{display:flex;flex-direction:column;gap:0.3rem}
+  .nav-item{display:flex;align-items:center;gap:0.7rem;padding:0.6rem 0.8rem;border-radius:4px;cursor:pointer;color:var(--muted);font-size:12px;letter-spacing:0.05em;transition:all 0.2s;background:none;border:none;width:100%;text-align:left;font-family:var(--mono)}
+  .nav-item:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+  .nav-item.active{background:rgba(200,169,110,0.12);color:var(--accent)}
+  .sidebar-stat{background:var(--surface2);border:1px solid var(--border);padding:1rem}
+  .stat-value{font-family:var(--serif);font-size:2rem;font-weight:300;color:var(--accent)}
+  .stat-label{font-size:10px;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase}
+
+  .main{margin-left:240px;flex:1;display:flex;flex-direction:column}
+  .topbar{border-bottom:1px solid var(--border);padding:1.2rem 2.5rem;display:flex;justify-content:space-between;align-items:center;background:rgba(10,10,11,0.8);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10}
+  .topbar-title{font-family:var(--serif);font-size:1.3rem;font-weight:300}
+  .content{padding:2rem 2.5rem;flex:1}
+
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:2rem}
+  .stat-card{background:var(--surface);padding:1.5rem;display:flex;flex-direction:column;gap:0.3rem}
+  .stat-card-value{font-family:var(--serif);font-size:2.5rem;font-weight:300;color:var(--accent);line-height:1}
+  .stat-card-label{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+
+  .form-panel{background:var(--surface);border:1px solid var(--border);padding:2rem;margin-bottom:2rem}
+  .form-panel-title{font-family:var(--serif);font-size:1.2rem;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+  .form-field{display:flex;flex-direction:column;gap:0.4rem}
+  .form-field.full{grid-column:1/-1}
+  .form-field label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted)}
+  .form-field input,.form-field textarea,.form-field select{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;font-weight:300;padding:0.7rem 0.9rem;outline:none;transition:border-color 0.2s;width:100%;resize:vertical}
+  .form-field input:focus,.form-field textarea:focus,.form-field select:focus{border-color:var(--accent)}
+  .form-field select option{background:var(--surface)}
+  .form-field textarea{min-height:180px}
+  .form-actions{display:flex;gap:0.8rem;justify-content:flex-end;margin-top:1.5rem}
+
+  .btn{padding:0.6rem 1.4rem;font-family:var(--mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;border:1px solid;cursor:pointer;transition:all 0.2s}
+  .btn-primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}
+  .btn-primary:hover{background:var(--accent2);border-color:var(--accent2)}
+  .btn-ghost{background:transparent;color:var(--muted);border-color:var(--border)}
+  .btn-ghost:hover{color:var(--text);border-color:rgba(255,255,255,0.2)}
+  .btn-danger{background:transparent;color:var(--danger);border-color:var(--danger)}
+  .btn-danger:hover{background:var(--danger);color:var(--bg)}
+  .btn-sm{padding:0.35rem 0.8rem;font-size:10px}
+
+  .table-panel{background:var(--surface);border:1px solid var(--border)}
+  .table-header{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .table-title{font-family:var(--serif);font-size:1.1rem;font-weight:300}
+  .search-input{background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:0.5rem 0.9rem;outline:none;width:220px;transition:border-color 0.2s}
+  .search-input:focus{border-color:var(--accent)}
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:0.8rem 1.5rem;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);font-weight:300}
+  td{padding:0.9rem 1.5rem;border-bottom:1px solid var(--border);vertical-align:middle}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(255,255,255,0.02)}
+  .article-title-cell{font-family:var(--serif);font-size:1rem;font-weight:400;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{display:inline-block;padding:0.2rem 0.6rem;font-size:9px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid}
+  .badge-pub{color:var(--success);border-color:var(--success);background:rgba(90,200,122,0.08)}
+  .badge-draft{color:var(--muted);border-color:var(--border)}
+  .actions-cell{display:flex;gap:0.4rem}
+
+  .toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface);border:1px solid var(--accent);padding:1rem 1.5rem;font-size:12px;color:var(--accent);z-index:1000;animation:toastIn 0.3s ease}
+  @keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  .empty-state{text-align:center;padding:4rem;color:var(--muted)}
+  .empty-state-icon{font-size:3rem;margin-bottom:1rem;opacity:0.3}
+  .tag-list{display:flex;gap:0.4rem;flex-wrap:wrap}
+  .tag{background:rgba(200,169,110,0.1);color:var(--accent);font-size:9px;padding:0.15rem 0.5rem;letter-spacing:0.1em}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef} = React;
+
+const INITIAL = [
+  {id:1,title:"Proč je rychlost webu důležitější než kdy dřív",excerpt:"Core Web Vitals a jejich vliv na SEO...",content:"Obsah článku...",category:"WordPress",tags:["SEO","Performance","WordPress"],status:"published",date:"2025-03-15",views:347},
+  {id:2,title:"Joomla vs WordPress v roce 2025",excerpt:"Srovnání dvou gigantů CMS světa...",content:"Obsah srovnávacího článku...",category:"Joomla",tags:["CMS","Joomla","WordPress"],status:"published",date:"2025-02-02",views:512},
+  {id:3,title:"Kompozice ve fotografii: pravidla, která stojí za porušení",excerpt:"Zlatý řez, pravidlo třetin...",content:"Obsah článku...",category:"Fotografie",tags:["Fotografie","Kompozice"],status:"published",date:"2025-01-10",views:289},
+  {id:4,title:"Headless WordPress – budoucnost nebo hype?",excerpt:"React frontend + WordPress jako headless CMS...",content:"Obsah článku...",category:"WordPress",tags:["Headless","React"],status:"draft",date:"2025-03-20",views:0}
+];
+
+const CATS = ["WordPress","Joomla","Fotografie","Vývoj","Design","Obecné"];
+
+function Toast({msg,onDone}){
+  useEffect(()=>{const t=setTimeout(onDone,2500);return()=>clearTimeout(t)},[]);
+  return <div className="toast">{msg}</div>;
+}
+
+function ArticleForm({initial,onSave,onCancel}){
+  const [f,setF]=useState(initial||{title:'',excerpt:'',content:'',category:'WordPress',tags:'',status:'draft',date:new Date().toISOString().split('T')[0]});
+  const s=(k,v)=>setF(p=>({...p,[k]:v}));
+  const save=()=>{
+    if(!f.title.trim()){alert('Zadejte název');return;}
+    onSave({...f,tags:typeof f.tags==='string'?f.tags.split(',').map(t=>t.trim()).filter(Boolean):f.tags});
+  };
+  const tagsStr=Array.isArray(f.tags)?f.tags.join(', '):f.tags;
+  return(
+    <div className="form-panel">
+      <div className="form-panel-title">
+        <span>{initial?.id?'Upravit článek':'Nový článek'}</span>
+        <button className="btn btn-ghost btn-sm" onClick={onCancel}>✕ Zrušit</button>
+      </div>
+      <div className="form-grid">
+        <div className="form-field full"><label>Název článku</label><input value={f.title} onChange={e=>s('title',e.target.value)} placeholder="Zadejte název..."/></div>
+        <div className="form-field"><label>Kategorie</label><select value={f.category} onChange={e=>s('category',e.target.value)}>{CATS.map(c=><option key={c}>{c}</option>)}</select></div>
+        <div className="form-field"><label>Stav</label><select value={f.status} onChange={e=>s('status',e.target.value)}><option value="draft">Koncept</option><option value="published">Publikováno</option></select></div>
+        <div className="form-field"><label>Datum</label><input type="date" value={f.date} onChange={e=>s('date',e.target.value)}/></div>
+        <div className="form-field"><label>Tagy (čárkou)</label><input value={tagsStr} onChange={e=>s('tags',e.target.value)} placeholder="SEO, WordPress..."/></div>
+        <div className="form-field full"><label>Perex</label><input value={f.excerpt} onChange={e=>s('excerpt',e.target.value)} placeholder="Krátký popis..."/></div>
+        <div className="form-field full"><label>Obsah</label><textarea value={f.content} onChange={e=>s('content',e.target.value)} placeholder="Obsah článku..."/></div>
+      </div>
+      <div className="form-actions">
+        <button className="btn btn-ghost" onClick={onCancel}>Zrušit</button>
+        <button className="btn btn-primary" onClick={save}>{initial?.id?'✓ Uložit':'+ Přidat'}</button>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [articles,setArticles]=useState(INITIAL);
+  const [view,setView]=useState('dashboard');
+  const [editing,setEditing]=useState(null);
+  const [search,setSearch]=useState('');
+  const [toast,setToast]=useState(null);
+  const nid=useRef(10);
+
+  const show=msg=>setToast(msg);
+  const filtered=articles.filter(a=>a.title.toLowerCase().includes(search.toLowerCase())||a.category.toLowerCase().includes(search.toLowerCase()));
+  const published=articles.filter(a=>a.status==='published').length;
+  const drafts=articles.filter(a=>a.status==='draft').length;
+  const views=articles.reduce((s,a)=>s+(a.views||0),0);
+
+  const save=data=>{
+    if(editing?.id){setArticles(p=>p.map(a=>a.id===editing.id?{...a,...data}:a));show('Článek upraven ✓');}
+    else{setArticles(p=>[...p,{...data,id:nid.current++,views:0}]);show('Článek přidán ✓');}
+    setEditing(null);setView('articles');
+  };
+  const del=id=>{if(!confirm('Smazat?'))return;setArticles(p=>p.filter(a=>a.id!==id));show('Smazáno');};
+  const edit=a=>{setEditing({...a,tags:a.tags.join(', ')});setView('edit');};
+  const top=[...articles].sort((a,b)=>b.views-a.views).slice(0,3);
+
+  return(
+    <div id="root">
+      <aside className="sidebar">
+        <div className="sidebar-logo">Admin<span>.</span></div>
+        <div>
+          <div className="sidebar-label">Navigace</div>
+          <nav className="sidebar-nav">
+            <button className={`nav-item ${view==='dashboard'?'active':''}`} onClick={()=>setView('dashboard')}>◈ Dashboard</button>
+            <button className={`nav-item ${view==='articles'||view==='edit'?'active':''}`} onClick={()=>{setView('articles');setEditing(null);}}>≡ Články</button>
+            <button className={`nav-item ${view==='new'?'active':''}`} onClick={()=>{setEditing(null);setView('new');}}>+ Nový článek</button>
+          </nav>
+        </div>
+        <div>
+          <div className="sidebar-label">Shrnutí</div>
+          <div className="sidebar-stat">
+            <div className="stat-value">{articles.length}</div>
+            <div className="stat-label">Celkem článků</div>
+          </div>
+        </div>
+        <a href="index.html" style={{color:'var(--muted)',fontSize:'11px',textDecoration:'none',marginTop:'auto',letterSpacing:'0.08em'}}>← Zpět na web</a>
+      </aside>
+
+      <main className="main">
+        <div className="topbar">
+          <span className="topbar-title">{view==='dashboard'&&'Dashboard'}{view==='articles'&&'Správa článků'}{view==='new'&&'Nový článek'}{view==='edit'&&'Upravit článek'}</span>
+          <span style={{color:'var(--muted)',fontSize:'11px'}}>Jan Novák</span>
+        </div>
+        <div className="content">
+
+          {view==='dashboard'&&(
+            <>
+              <div className="stats-row">
+                <div className="stat-card"><div className="stat-card-value">{articles.length}</div><div className="stat-card-label">Všechny články</div></div>
+                <div className="stat-card"><div className="stat-card-value">{published}</div><div className="stat-card-label">Publikováno</div></div>
+                <div className="stat-card"><div className="stat-card-value">{drafts}</div><div className="stat-card-label">Koncepty</div></div>
+                <div className="stat-card"><div className="stat-card-value">{views.toLocaleString()}</div><div className="stat-card-label">Zobrazení</div></div>
+              </div>
+              <div className="table-panel">
+                <div className="table-header"><span className="table-title">Nejčtenější</span><button className="btn btn-ghost btn-sm" onClick={()=>setView('new')}>+ Nový</button></div>
+                <table><thead><tr><th>Název</th><th>Kategorie</th><th>Zobrazení</th><th>Stav</th></tr></thead>
+                <tbody>{top.map(a=><tr key={a.id}><td><div className="article-title-cell">{a.title}</div></td><td style={{color:'var(--accent)',fontSize:'11px'}}>{a.category}</td><td style={{color:'var(--muted)'}}>{a.views.toLocaleString()}</td><td><span className={`badge ${a.status==='published'?'badge-pub':'badge-draft'}`}>{a.status==='published'?'Pub.':'Draft'}</span></td></tr>)}</tbody>
+                </table>
+              </div>
+            </>
+          )}
+
+          {(view==='articles'||view==='edit')&&(
+            <>
+              {view==='edit'&&editing&&<ArticleForm initial={editing} onSave={save} onCancel={()=>{setView('articles');setEditing(null);}}/>}
+              <div className="table-panel">
+                <div className="table-header">
+                  <span className="table-title">Všechny články ({filtered.length})</span>
+                  <input className="search-input" placeholder="Hledat..." value={search} onChange={e=>setSearch(e.target.value)}/>
+                </div>
+                {filtered.length===0?<div className="empty-state"><div className="empty-state-icon">◈</div><div>Žádné články</div></div>:(
+                  <table><thead><tr><th>Název</th><th>Kategorie</th><th>Tagy</th><th>Datum</th><th>Stav</th><th>Akce</th></tr></thead>
+                  <tbody>{filtered.map(a=><tr key={a.id}>
+                    <td><div className="article-title-cell">{a.title}</div></td>
+                    <td style={{color:'var(--accent)',fontSize:'11px'}}>{a.category}</td>
+                    <td><div className="tag-list">{a.tags.slice(0,2).map(t=><span key={t} className="tag">{t}</span>)}{a.tags.length>2&&<span className="tag">+{a.tags.length-2}</span>}</div></td>
+                    <td style={{color:'var(--muted)'}}>{a.date}</td>
+                    <td><span className={`badge ${a.status==='published'?'badge-pub':'badge-draft'}`}>{a.status==='published'?'Publikováno':'Koncept'}</span></td>
+                    <td><div className="actions-cell"><button className="btn btn-ghost btn-sm" onClick={()=>edit(a)}>Upravit</button><button className="btn btn-danger btn-sm" onClick={()=>del(a.id)}>✕</button></div></td>
+                  </tr>)}</tbody></table>
+                )}
+              </div>
+            </>
+          )}
+
+          {view==='new'&&<ArticleForm initial={null} onSave={save} onCancel={()=>setView('articles')}/>}
+        </div>
+      </main>
+      {toast&&<Toast msg={toast} onDone={()=>setToast(null)}/>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
