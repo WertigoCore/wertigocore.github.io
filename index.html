@@ -333,9 +333,9 @@ async function loadBlog(){
     return;
   }
   try{
-    // Cache bust po 1 hodině — návštěvník uvidí nové články do hodiny
-    const v = Math.floor(Date.now()/3_600_000);
-    const r = await fetch(`${RAW_URL}?v=${v}`);
+    // Cache bust po 5 minutách
+    const v = Math.floor(Date.now()/300_000);
+    const r = await fetch(`${RAW_URL}?v=${v}`, { cache: 'no-store' });
     if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
     const all = await r.json();
     const posts = all.filter(p=>p.status==='published').sort((a,b)=>new Date(b.date)-new Date(a.date));
