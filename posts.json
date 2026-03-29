@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "title": "Jak optimalizovat WordPress pro rychlost",
+    "excerpt": "Praktický průvodce optimalizací — od výběru hostingu po lazyloading a cachování. Dosáhněte skóre 95+ v PageSpeed.",
+    "category": "WordPress",
+    "date": "2026-03-12",
+    "status": "published",
+    "content": "Rychlost načítání webu je dnes jedním z nejdůležitějších faktorů jak pro uživatelský zážitek, tak pro SEO.\n\nZákladem je správný hosting — vyberte server co nejblíže vašim návštěvníkům a preferujte NVMe SSD storage. Bez dobrého základu vám žádný plugin nepomůže.\n\nDále se zaměřte na obrázky: převeďte je do formátu WebP, nastavte lazy loading a použijte CDN pro statické soubory. Samotné obrázky tvoří typicky 60–80 % váhy stránky.\n\nPro WordPress doporučuji kombinaci pluginů WP Rocket nebo LiteSpeed Cache + Imagify. S těmito nástroji jsem u klientů opakovaně dosáhl Lighthouse skóre nad 95 bodů."
+  },
+  {
+    "id": 2,
+    "title": "Zlatá hodinka — proč fotografovat při soumraku",
+    "excerpt": "Světlo ve zlaté hodince mění průměrnou fotografii v umělecké dílo. Tipy, jak ho využít naplno s jakýmkoli fotoaparátem.",
+    "category": "Fotografie",
+    "date": "2026-02-28",
+    "status": "published",
+    "content": "Zlatá hodinka nastává přibližně hodinu po východu a hodinu před západem slunce. V tuto dobu je světlo měkké, teplé a přichází ze strany — ideální podmínky pro fotografii.\n\nProč je toto světlo tak zvláštní? Slunce je nízko nad horizontem, paprsky procházejí silnější vrstvou atmosféry, která filtruje modré složky světla. Výsledkem je zlatavý odstín, který dodává snímkům hloubku a charakter.\n\nPraktický tip: Naplánujte focení s předstihem pomocí aplikace PhotoPills nebo Golden Hour. Přijďte na místo aspoň 20 minut před zlatou hodinkhou, abyste měli čas se zorientovat a připravit kompozici."
+  },
+  {
+    "id": 3,
+    "title": "Joomla vs WordPress v roce 2026",
+    "excerpt": "Porovnání dvou CMS gigantů z pohledu vývojáře. Kdy sáhnout po Joomle a kdy zůstat u WordPress?",
+    "category": "CMS",
+    "date": "2026-02-05",
+    "status": "draft",
+    "content": "Tento článek je zatím ve fázi konceptu."
+  }
+]

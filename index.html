@@ -3,471 +3,249 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Jan Novák – webový vývojář, Joomla & WordPress specialista, fotograf">
-<title>Jan Novák</title>
+<title>Jan Novák — Web Developer & Fotograf</title>
+<meta name="description" content="Jan Novák — webový vývojář, Joomla & WordPress specialista a fotograf.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0b;
-    --bg2: #111114;
-    --surface: #16161a;
-    --border: rgba(255,255,255,0.07);
-    --accent: #c8a96e;
-    --accent2: #e8c98e;
-    --text: #e8e6e0;
-    --muted: #6b6860;
-    --serif: 'Cormorant Garamond', Georgia, serif;
-    --mono: 'DM Mono', monospace;
+    --bg:#0a0a0a;--bg2:#111;--surface:#161616;--border:#222;
+    --accent:#c9a96e;--accent2:#e8d5b0;--text:#e8e4dc;--muted:#6b6660;
+    --serif:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',monospace;
   }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.7;
-    overflow-x: hidden;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-    opacity: 0.4;
-  }
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 4rem;
-    background: rgba(10,10,11,0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    transition: padding 0.3s;
-  }
-  .nav-logo {
-    font-family: var(--serif);
-    font-size: 1.3rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--text);
-    text-decoration: none;
-  }
-  .nav-logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 12px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: color 0.25s;
-  }
-  .nav-links a:hover { color: var(--accent); }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;font-weight:300;line-height:1.7;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.4}
 
-  #hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    padding: 8rem 4rem 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-grid {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(200,169,110,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(200,169,110,0.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-  }
-  .hero-glow {
-    position: absolute;
-    width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(200,169,110,0.08) 0%, transparent 70%);
-    top: 10%; left: -10%;
-    pointer-events: none;
-  }
-  .hero-content { position: relative; max-width: 900px; }
-  .hero-label {
-    font-size: 11px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeUp 0.8s 0.2s forwards;
-  }
-  .hero-name {
-    font-family: var(--serif);
-    font-size: clamp(4rem, 9vw, 8rem);
-    font-weight: 300;
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    margin-bottom: 2rem;
-    opacity: 0;
-    animation: fadeUp 0.9s 0.35s forwards;
-  }
-  .hero-name em { font-style: italic; color: var(--accent); }
-  .hero-desc {
-    max-width: 480px;
-    color: var(--muted);
-    font-size: 13px;
-    line-height: 1.9;
-    margin-bottom: 3rem;
-    opacity: 0;
-    animation: fadeUp 0.9s 0.5s forwards;
-  }
-  .hero-cta {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeUp 0.9s 0.65s forwards;
-  }
-  .btn {
-    display: inline-block;
-    padding: 0.8rem 2rem;
-    text-decoration: none;
-    font-family: var(--mono);
-    font-size: 12px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    transition: all 0.25s;
-    border: 1px solid;
-    cursor: pointer;
-  }
-  .btn-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .btn-primary:hover { background: var(--accent2); border-color: var(--accent2); }
-  .btn-ghost { background: transparent; color: var(--text); border-color: var(--border); }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .hero-scroll {
-    position: absolute;
-    bottom: 2.5rem; right: 4rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    opacity: 0;
-    animation: fadeUp 1s 1s forwards;
-  }
-  .scroll-line {
-    width: 1px; height: 50px;
-    background: linear-gradient(var(--accent), transparent);
-    animation: scrollPulse 2s infinite;
-  }
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:24px 48px;background:rgba(10,10,10,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);transition:padding .3s}
+  .nav-logo{font-family:var(--serif);font-size:20px;font-weight:300;letter-spacing:.05em;color:var(--text);text-decoration:none}
+  .nav-logo span{color:var(--accent)}
+  .nav-links{display:flex;gap:40px;list-style:none}
+  .nav-links a{color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:.15em;text-transform:uppercase;transition:color .3s}
+  .nav-links a:hover{color:var(--accent)}
+  .nav-cta{color:var(--accent)!important;border:1px solid var(--accent)!important;padding:8px 20px}
+  .nav-cta:hover{background:var(--accent)!important;color:var(--bg)!important}
 
-  section { padding: 7rem 4rem; max-width: 1200px; margin: 0 auto; }
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    margin-bottom: 4rem;
-  }
-  .section-number { font-size: 11px; color: var(--accent); letter-spacing: 0.15em; }
-  .section-title {
-    font-family: var(--serif);
-    font-size: clamp(2rem, 4vw, 3.5rem);
-    font-weight: 300;
-    letter-spacing: -0.01em;
-  }
-  .section-line { flex: 1; height: 1px; background: var(--border); }
+  #hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;position:relative;overflow:hidden}
+  .hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:120px 64px 80px 48px;position:relative;z-index:2}
+  .hero-tag{font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--accent);margin-bottom:32px;opacity:0;animation:fadeUp 1s ease .3s forwards}
+  .hero-title{font-family:var(--serif);font-size:clamp(56px,7vw,96px);font-weight:300;line-height:1;letter-spacing:-.02em;opacity:0;animation:fadeUp 1s ease .5s forwards}
+  .hero-title em{font-style:italic;color:var(--accent)}
+  .hero-desc{margin-top:32px;max-width:400px;color:var(--muted);font-size:13px;line-height:1.8;opacity:0;animation:fadeUp 1s ease .7s forwards}
+  .hero-actions{margin-top:48px;display:flex;gap:16px;opacity:0;animation:fadeUp 1s ease .9s forwards}
+  .btn-primary{display:inline-block;padding:14px 32px;background:var(--accent);color:var(--bg);text-decoration:none;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-family:var(--mono);transition:background .3s,transform .2s;border:none;cursor:pointer}
+  .btn-primary:hover{background:var(--accent2);transform:translateY(-2px)}
+  .btn-ghost{display:inline-block;padding:14px 32px;border:1px solid var(--border);color:var(--muted);text-decoration:none;font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-family:var(--mono);transition:border-color .3s,color .3s,transform .2s}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-2px)}
+  .hero-right{position:relative;overflow:hidden}
+  .hero-img-placeholder{position:absolute;inset:0;background:linear-gradient(135deg,#1a1510,#0f0e0c,#141210);display:flex;align-items:center;justify-content:center}
+  .hero-img-placeholder::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 50%,rgba(201,169,110,.08),transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(201,169,110,.05),transparent 40%)}
+  .hero-grid-lines{position:absolute;inset:0;background-image:linear-gradient(rgba(201,169,110,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.03) 1px,transparent 1px);background-size:40px 40px;opacity:0;animation:fadeIn 2s ease 1s forwards}
+  .hero-photo-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:280px;height:360px;border:1px solid rgba(201,169,110,.2);display:flex;align-items:center;justify-content:center;opacity:0;animation:fadeIn 1s ease 1.2s forwards}
+  .hero-photo-frame::before{content:'';position:absolute;top:-20px;right:-20px;width:100%;height:100%;border:1px solid rgba(201,169,110,.08)}
+  .hero-photo-inner{width:calc(100% - 32px);height:calc(100% - 32px);background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+  .hero-photo-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .hero-scroll{position:absolute;bottom:40px;left:48px;display:flex;align-items:center;gap:12px;color:var(--muted);font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:0;animation:fadeIn 1s ease 1.5s forwards}
+  .scroll-line{width:40px;height:1px;background:var(--accent)}
 
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5rem;
-    align-items: start;
-  }
-  .about-text p { color: var(--muted); margin-bottom: 1.2rem; font-size: 13.5px; line-height: 1.9; }
-  .about-text p strong { color: var(--text); font-weight: 400; }
-  .skills-list { display: flex; flex-direction: column; gap: 1rem; }
-  .skill-item { display: flex; flex-direction: column; gap: 0.4rem; }
-  .skill-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text);
-  }
-  .skill-pct { color: var(--accent); }
-  .skill-bar { height: 2px; background: var(--border); position: relative; }
-  .skill-fill {
-    position: absolute;
-    top: 0; left: 0; bottom: 0;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    width: 0;
-    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
+  section{padding:120px 48px;max-width:1200px;margin:0 auto}
+  .section-header{display:flex;align-items:baseline;gap:24px;margin-bottom:80px}
+  .section-num{font-size:10px;letter-spacing:.2em;color:var(--accent)}
+  .section-title{font-family:var(--serif);font-size:clamp(36px,5vw,64px);font-weight:300;line-height:1}
+  .section-line{flex:1;height:1px;background:var(--border);margin-bottom:6px}
 
-  .portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 1.5px;
-  }
-  .portfolio-item {
-    position: relative;
-    aspect-ratio: 4/3;
-    background: var(--surface);
-    overflow: hidden;
-    cursor: pointer;
-  }
-  .p-ph {
-    width: 100%; height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3rem;
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .portfolio-item:hover .p-ph { transform: scale(1.05); }
-  .ph-1 { background: linear-gradient(135deg, #1a1a1f, #252530); }
-  .ph-2 { background: linear-gradient(135deg, #1a1f1a, #252a25); }
-  .ph-3 { background: linear-gradient(135deg, #1f1a1a, #2a2525); }
-  .ph-4 { background: linear-gradient(135deg, #1a1a24, #25253a); }
-  .ph-5 { background: linear-gradient(135deg, #201a1a, #302525); }
-  .ph-6 { background: linear-gradient(135deg, #1a1f24, #252a35); }
-  .portfolio-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(to top, rgba(10,10,11,0.95) 0%, transparent 60%);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    padding: 1.8rem;
-    opacity: 0;
-    transition: opacity 0.4s;
-  }
-  .portfolio-item:hover .portfolio-overlay { opacity: 1; }
-  .portfolio-cat { font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.4rem; }
-  .portfolio-name { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; color: var(--text); }
+  #services{border-top:1px solid var(--border)}
+  .services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border)}
+  .service-card{background:var(--bg);padding:48px 40px;position:relative;transition:background .3s;overflow:hidden}
+  .service-card::before{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--accent);transition:width .4s}
+  .service-card:hover{background:var(--surface)}
+  .service-card:hover::before{width:100%}
+  .service-num{font-size:10px;letter-spacing:.2em;color:var(--accent);margin-bottom:24px}
+  .service-name{font-family:var(--serif);font-size:28px;font-weight:300;margin-bottom:16px;line-height:1.2}
+  .service-desc{color:var(--muted);font-size:12px;line-height:1.8}
+  .service-tags{margin-top:24px;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--border);color:var(--muted)}
 
-  .blog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; }
-  .blog-card {
-    border: 1px solid var(--border);
-    padding: 2rem;
-    background: var(--surface);
-    transition: border-color 0.3s, transform 0.3s;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-  .blog-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--accent), transparent);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s;
-  }
-  .blog-card:hover { border-color: rgba(200,169,110,0.25); transform: translateY(-3px); }
-  .blog-card:hover::before { transform: scaleX(1); }
-  .blog-date { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.8rem; }
-  .blog-title { font-family: var(--serif); font-size: 1.4rem; font-weight: 400; margin-bottom: 0.8rem; line-height: 1.3; }
-  .blog-excerpt { color: var(--muted); font-size: 12.5px; line-height: 1.8; margin-bottom: 1.5rem; }
-  .blog-read { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 0.5rem; }
-  .blog-read::after { content: '→'; transition: transform 0.2s; }
-  .blog-card:hover .blog-read::after { transform: translateX(4px); }
+  #portfolio{border-top:1px solid var(--border)}
+  .portfolio-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px}
+  .portfolio-item{position:relative;aspect-ratio:4/3;background:var(--surface);overflow:hidden;cursor:pointer}
+  .portfolio-item:first-child{grid-column:span 2;aspect-ratio:16/7}
+  .portfolio-placeholder{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#161410,#111010);transition:transform .6s cubic-bezier(.25,.46,.45,.94)}
+  .portfolio-item:hover .portfolio-placeholder{transform:scale(1.03)}
+  .portfolio-overlay{position:absolute;inset:0;background:rgba(10,10,10,.7);display:flex;flex-direction:column;justify-content:flex-end;padding:32px;opacity:0;transition:opacity .3s}
+  .portfolio-item:hover .portfolio-overlay{opacity:1}
+  .portfolio-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  .portfolio-name{font-family:var(--serif);font-size:28px;font-weight:300}
+  .portfolio-icon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
 
-  #contact { max-width: 800px; }
-  .contact-intro { color: var(--muted); font-size: 13px; margin-bottom: 3rem; line-height: 1.9; }
-  .contact-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-  }
-  .form-group { background: var(--bg); padding: 1.5rem; }
-  .form-group.full { grid-column: 1 / -1; }
-  .form-group label { display: block; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem; }
-  .form-group input,
-  .form-group textarea {
-    width: 100%;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: var(--text);
-    font-family: var(--mono);
-    font-size: 13px;
-    font-weight: 300;
-    resize: none;
-  }
-  .form-group input::placeholder,
-  .form-group textarea::placeholder { color: var(--muted); opacity: 0.5; }
-  .form-group textarea { min-height: 120px; }
-  .form-submit { grid-column: 1 / -1; background: var(--bg); padding: 1.5rem; display: flex; justify-content: flex-end; }
-  .contact-links { display: flex; gap: 2rem; margin-top: 3rem; flex-wrap: wrap; }
-  .contact-link { display: flex; align-items: center; gap: 0.6rem; color: var(--muted); text-decoration: none; font-size: 12px; letter-spacing: 0.08em; transition: color 0.25s; }
-  .contact-link:hover { color: var(--accent); }
+  #blog{border-top:1px solid var(--border)}
+  .blog-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+  .blog-card{border-top:1px solid var(--border);padding-top:32px;position:relative;cursor:pointer;transition:border-color .3s}
+  .blog-card::before{content:'';position:absolute;top:-1px;left:0;width:0;height:1px;background:var(--accent);transition:width .4s}
+  .blog-card:hover{border-color:transparent}
+  .blog-card:hover::before{width:100%}
+  .blog-date{font-size:10px;letter-spacing:.15em;color:var(--accent);margin-bottom:8px}
+  .blog-cat{display:inline-block;font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--border);color:var(--muted);margin-left:8px}
+  .blog-title{font-family:var(--serif);font-size:22px;font-weight:300;line-height:1.3;margin-bottom:12px;margin-top:12px}
+  .blog-excerpt{color:var(--muted);font-size:12px;line-height:1.8}
+  .blog-read{display:inline-flex;align-items:center;gap:8px;margin-top:20px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);background:none;border:none;font-family:var(--mono);padding:0;cursor:pointer}
+  .blog-arrow{width:20px;height:1px;background:var(--accent);position:relative;display:inline-block;transition:width .3s}
+  .blog-card:hover .blog-arrow{width:32px}
+  .blog-arrow::after{content:'';position:absolute;right:0;top:-3px;width:6px;height:6px;border-top:1px solid var(--accent);border-right:1px solid var(--accent);transform:rotate(45deg)}
+  .blog-loading{color:var(--muted);font-size:12px;letter-spacing:.1em;padding:48px 0;display:flex;align-items:center;gap:12px;grid-column:1/-1}
+  .blog-loading::before{content:'';display:inline-block;width:14px;height:14px;border:1px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+  .blog-empty{color:var(--muted);font-size:13px;padding:48px 0;grid-column:1/-1}
+  .blog-error{color:var(--muted);font-size:12px;padding:32px 0;line-height:2;grid-column:1/-1}
+  .blog-error code{color:var(--accent);font-family:var(--mono)}
+  .demo-notice{display:inline-block;margin-bottom:24px;font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:6px 14px;border:1px solid rgba(201,169,110,.3);color:var(--accent);background:rgba(201,169,110,.05);grid-column:1/-1}
 
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 4rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: var(--muted);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-  }
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+  .modal-overlay.open{opacity:1;pointer-events:all}
+  .article-modal{background:var(--bg2);border:1px solid var(--border);width:90%;max-width:760px;max-height:88vh;display:flex;flex-direction:column;transform:translateY(20px);transition:transform .3s}
+  .modal-overlay.open .article-modal{transform:translateY(0)}
+  .modal-head{padding:32px 40px 24px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
+  .modal-body{padding:32px 40px;overflow-y:auto}
+  .modal-body p{color:var(--muted);font-size:13px;line-height:2;white-space:pre-line}
+  .modal-meta{font-size:10px;letter-spacing:.15em;color:var(--accent);margin-bottom:12px}
+  .modal-title{font-family:var(--serif);font-size:32px;font-weight:300;line-height:1.2}
+  .close-btn{background:none;border:none;color:var(--muted);font-size:24px;cursor:pointer;line-height:1;flex-shrink:0;transition:color .2s}
+  .close-btn:hover{color:var(--text)}
 
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes scrollPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
-  .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s, transform 0.8s; }
-  .reveal.visible { opacity: 1; transform: none; }
+  #contact{border-top:1px solid var(--border)}
+  .contact-inner{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+  .contact-left h2{font-family:var(--serif);font-size:clamp(40px,5vw,72px);font-weight:300;line-height:1;margin-bottom:24px}
+  .contact-left h2 em{font-style:italic;color:var(--accent)}
+  .contact-left p{color:var(--muted);font-size:13px;line-height:1.8;max-width:360px}
+  .contact-info{margin-top:48px;display:flex;flex-direction:column;gap:16px}
+  .contact-item{display:flex;gap:16px;align-items:center}
+  .ci-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);width:60px;flex-shrink:0}
+  .ci-value{color:var(--text);font-size:13px;text-decoration:none;transition:color .2s}
+  .ci-value:hover{color:var(--accent)}
+  .contact-form{display:flex;flex-direction:column;gap:24px}
+  .form-group{display:flex;flex-direction:column;gap:8px}
+  .form-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+  .form-input,.form-textarea{background:var(--surface);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:13px;font-weight:300;padding:14px 16px;outline:none;transition:border-color .3s;resize:none;width:100%}
+  .form-input:focus,.form-textarea:focus{border-color:var(--accent)}
+  .form-textarea{min-height:140px}
+  .form-submit{align-self:flex-start;padding:16px 40px;background:var(--accent);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .3s,transform .2s}
+  .form-submit:hover{background:var(--accent2);transform:translateY(-2px)}
 
-  @media (max-width: 768px) {
-    nav { padding: 1.2rem 1.5rem; }
-    .nav-links { display: none; }
-    #hero { padding: 7rem 1.5rem 4rem; }
-    section { padding: 5rem 1.5rem; }
-    .about-grid { grid-template-columns: 1fr; gap: 3rem; }
-    .contact-form { grid-template-columns: 1fr; }
-    footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 1.5rem; }
-    .hero-scroll { display: none; }
+  footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify-content:space-between;align-items:center}
+  .footer-copy{font-size:11px;color:var(--muted);letter-spacing:.1em}
+  .footer-links{display:flex;gap:32px}
+  .footer-links a{font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.1em;transition:color .2s}
+  .footer-links a:hover{color:var(--accent)}
+  .footer-admin{color:var(--border)!important}
+  .footer-admin:hover{color:var(--muted)!important}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.visible{opacity:1;transform:translateY(0)}
+
+  @media(max-width:900px){
+    nav{padding:20px 24px}
+    .nav-links{display:none}
+    #hero{grid-template-columns:1fr}
+    .hero-right{display:none}
+    .hero-left{padding:120px 24px 80px}
+    section{padding:80px 24px}
+    .services-grid{grid-template-columns:1fr}
+    .portfolio-grid{grid-template-columns:1fr}
+    .portfolio-item:first-child{grid-column:span 1;aspect-ratio:4/3}
+    .blog-grid{grid-template-columns:1fr}
+    .contact-inner{grid-template-columns:1fr;gap:48px}
+    footer{flex-direction:column;gap:16px;text-align:center}
+    .article-modal{width:96%}
+    .modal-head,.modal-body{padding:24px}
   }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="#hero" class="nav-logo">JN<span>.</span></a>
+  <a href="#" class="nav-logo">Jan <span>Novák</span></a>
   <ul class="nav-links">
-    <li><a href="#about">O mně</a></li>
+    <li><a href="#services">Služby</a></li>
     <li><a href="#portfolio">Portfolio</a></li>
     <li><a href="#blog">Blog</a></li>
-    <li><a href="#contact">Kontakt</a></li>
+    <li><a href="#contact" class="nav-cta">Kontakt</a></li>
   </ul>
 </nav>
 
-<section id="hero" style="max-width:100%;padding-left:4rem;padding-right:4rem;">
-  <div class="hero-grid"></div>
-  <div class="hero-glow"></div>
-  <div class="hero-content">
-    <p class="hero-label">Webový vývojář &amp; Fotograf</p>
-    <h1 class="hero-name">Jan<br><em>Novák</em></h1>
-    <p class="hero-desc">Vytvářím weby, které fungují. Specializuji se na vývoj na platformách Joomla &amp; WordPress a zachycuji svět objektivem fotoaparátu.</p>
-    <div class="hero-cta">
-      <a href="#portfolio" class="btn btn-primary">Prohlédnout práce</a>
-      <a href="#contact" class="btn btn-ghost">Napište mi</a>
+<section id="hero" style="max-width:100%;padding:0">
+  <div class="hero-left">
+    <p class="hero-tag">Web developer &amp; fotograf — Praha, CZ</p>
+    <h1 class="hero-title">Jan<br><em>Novák</em></h1>
+    <p class="hero-desc">Tvořím webové stránky a portály na Joomla &amp; WordPress. Zachycuji okamžiky objektivem. Kód a kompozice — dva způsoby, jak vidím svět.</p>
+    <div class="hero-actions">
+      <a href="#portfolio" class="btn-primary">Moje práce</a>
+      <a href="#contact" class="btn-ghost">Napište mi</a>
     </div>
   </div>
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    <span>Scroll</span>
+  <div class="hero-right">
+    <div class="hero-img-placeholder">
+      <div class="hero-grid-lines"></div>
+      <div class="hero-photo-frame">
+        <div class="hero-photo-inner">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#c9a96e" stroke-width="0.8" opacity="0.6">
+            <rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/>
+          </svg>
+          <p class="hero-photo-label">Vaše fotografie</p>
+        </div>
+      </div>
+    </div>
   </div>
+  <div class="hero-scroll"><span class="scroll-line"></span>Scroll</div>
 </section>
 
-<section id="about">
+<section id="services">
   <div class="section-header reveal">
-    <span class="section-number">01</span>
-    <h2 class="section-title">O mně</h2>
+    <span class="section-num">01</span>
+    <h2 class="section-title">Služby</h2>
     <div class="section-line"></div>
   </div>
-  <div class="about-grid">
-    <div class="about-text reveal">
-      <p>Jsem webový vývojář s vášní pro čistý kód a funkční design. <strong>Specializuji se na tvorbu webových portálů</strong> na platformách Joomla a WordPress — od jednoduchých prezentačních stránek po komplexní portály.</p>
-      <p>Paralelně se věnuji <strong>fotografii</strong>, která mě naučila vidět detail, kompozici a světlo — kvality, které přenáším i do svých webových projektů.</p>
-      <p>Věřím, že dobrý web je jako dobrá fotografie: říká přesně to, co má, bez zbytečného šumu.</p>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <p class="service-num">001</p><h3 class="service-name">WordPress<br>&amp; Joomla</h3>
+      <p class="service-desc">Tvorba a správa webových portálů na nejpoužívanějších CMS platformách. Šablony na míru, pluginy, optimalizace výkonu.</p>
+      <div class="service-tags"><span class="tag">WordPress</span><span class="tag">Joomla</span><span class="tag">CMS</span></div>
     </div>
-    <div class="skills-list reveal">
-      <div class="skill-item">
-        <div class="skill-label"><span>WordPress</span><span class="skill-pct">95%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="95"></div></div>
-      </div>
-      <div class="skill-item">
-        <div class="skill-label"><span>Joomla</span><span class="skill-pct">90%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="90"></div></div>
-      </div>
-      <div class="skill-item">
-        <div class="skill-label"><span>HTML / CSS</span><span class="skill-pct">92%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="92"></div></div>
-      </div>
-      <div class="skill-item">
-        <div class="skill-label"><span>JavaScript / React</span><span class="skill-pct">80%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="80"></div></div>
-      </div>
-      <div class="skill-item">
-        <div class="skill-label"><span>Fotografie</span><span class="skill-pct">88%</span></div>
-        <div class="skill-bar"><div class="skill-fill" data-width="88"></div></div>
-      </div>
+    <div class="service-card">
+      <p class="service-num">002</p><h3 class="service-name">Web<br>Development</h3>
+      <p class="service-desc">Moderní webové stránky s důrazem na rychlost, SEO a uživatelský zážitek. Od landing page po komplexní portály.</p>
+      <div class="service-tags"><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span><span class="tag">React</span></div>
+    </div>
+    <div class="service-card">
+      <p class="service-num">003</p><h3 class="service-name">Foto&shy;grafie</h3>
+      <p class="service-desc">Komerční i umělecká fotografie. Produkty, architektura, portréty, krajiny. Profesionální postprodukce.</p>
+      <div class="service-tags"><span class="tag">Komerční</span><span class="tag">Architektura</span><span class="tag">Portréty</span></div>
     </div>
   </div>
 </section>
 
-<section id="portfolio" style="max-width:100%;padding-left:4rem;padding-right:4rem;">
-  <div style="max-width:1200px;margin:0 auto;">
+<section id="portfolio" style="max-width:100%;padding-left:48px;padding-right:48px">
+  <div style="max-width:1200px;margin:0 auto">
     <div class="section-header reveal">
-      <span class="section-number">02</span>
+      <span class="section-num">02</span>
       <h2 class="section-title">Portfolio</h2>
       <div class="section-line"></div>
     </div>
     <div class="portfolio-grid reveal">
       <div class="portfolio-item">
-        <div class="p-ph ph-1">🌐</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">WordPress</span>
-          <span class="portfolio-name">Firemní portál</span>
-        </div>
+        <div class="portfolio-placeholder"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div></div>
+        <div class="portfolio-overlay"><p class="portfolio-label">Fotografie</p><h3 class="portfolio-name">Projekt západ slunce</h3></div>
       </div>
       <div class="portfolio-item">
-        <div class="p-ph ph-2">📷</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">Fotografie</span>
-          <span class="portfolio-name">Krajinná série</span>
-        </div>
+        <div class="portfolio-placeholder" style="background:linear-gradient(135deg,#101416,#0c0f11)"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div>
+        <div class="portfolio-overlay"><p class="portfolio-label">WordPress</p><h3 class="portfolio-name">E-shop — móda</h3></div>
       </div>
       <div class="portfolio-item">
-        <div class="p-ph ph-3">🏗️</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">Joomla</span>
-          <span class="portfolio-name">E-commerce portál</span>
-        </div>
-      </div>
-      <div class="portfolio-item">
-        <div class="p-ph ph-4">🎨</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">WordPress</span>
-          <span class="portfolio-name">Kreativní agentura</span>
-        </div>
-      </div>
-      <div class="portfolio-item">
-        <div class="p-ph ph-5">📸</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">Fotografie</span>
-          <span class="portfolio-name">Portréty</span>
-        </div>
-      </div>
-      <div class="portfolio-item">
-        <div class="p-ph ph-6">⚙️</div>
-        <div class="portfolio-overlay">
-          <span class="portfolio-cat">Joomla</span>
-          <span class="portfolio-name">Zpravodajský portál</span>
-        </div>
+        <div class="portfolio-placeholder" style="background:linear-gradient(135deg,#141210,#0f1410)"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="2" y="3" width="20" height="14" rx="1"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div></div>
+        <div class="portfolio-overlay"><p class="portfolio-label">Joomla</p><h3 class="portfolio-name">Komunitní portál</h3></div>
       </div>
     </div>
   </div>
@@ -475,116 +253,158 @@
 
 <section id="blog">
   <div class="section-header reveal">
-    <span class="section-number">03</span>
+    <span class="section-num">03</span>
     <h2 class="section-title">Blog</h2>
     <div class="section-line"></div>
   </div>
-  <div class="blog-grid">
-    <article class="blog-card reveal">
-      <div class="blog-date">15. března 2025</div>
-      <h3 class="blog-title">Proč je rychlost webu důležitější než kdy dřív</h3>
-      <p class="blog-excerpt">Core Web Vitals a jejich vliv na SEO. Jak optimalizovat WordPress stránku, aby dosáhla perfektního Lighthouse skóre.</p>
-      <span class="blog-read">Číst dál</span>
-    </article>
-    <article class="blog-card reveal" style="transition-delay:0.1s">
-      <div class="blog-date">2. února 2025</div>
-      <h3 class="blog-title">Joomla vs WordPress v roce 2025</h3>
-      <p class="blog-excerpt">Srovnání dvou gigantů CMS světa. Kdy sáhnout po Joomle a kdy je WordPress lepší volbou pro váš projekt.</p>
-      <span class="blog-read">Číst dál</span>
-    </article>
-    <article class="blog-card reveal" style="transition-delay:0.2s">
-      <div class="blog-date">10. ledna 2025</div>
-      <h3 class="blog-title">Kompozice ve fotografii: pravidla, která stojí za porušení</h3>
-      <p class="blog-excerpt">Zlatý řez, pravidlo třetin, negativní prostor. A kdy je nejlepší všechna tato pravidla ignorovat.</p>
-      <span class="blog-read">Číst dál</span>
-    </article>
+  <div id="blog-grid" class="blog-grid">
+    <p class="blog-loading">Načítám články</p>
   </div>
 </section>
 
 <section id="contact">
-  <div class="section-header reveal">
-    <span class="section-number">04</span>
-    <h2 class="section-title">Kontakt</h2>
-    <div class="section-line"></div>
-  </div>
-  <p class="contact-intro reveal">Máte projekt? Hledáte fotografa? Nebo jen chcete říct ahoj?<br>Napište mi — odpovídám do 24 hodin.</p>
-  <form class="contact-form reveal" onsubmit="handleSubmit(event)">
-    <div class="form-group">
-      <label>Jméno</label>
-      <input type="text" placeholder="Vaše jméno" required>
+  <div class="contact-inner reveal">
+    <div class="contact-left">
+      <h2>Začněme <em>spolupracovat</em></h2>
+      <p>Máte projekt? Hledáte fotografa nebo vývojáře? Napište mi — rád si promluvíme.</p>
+      <div class="contact-info">
+        <div class="contact-item"><span class="ci-label">Email</span><a href="mailto:jan@jannovak.cz" class="ci-value">jan@jannovak.cz</a></div>
+        <div class="contact-item"><span class="ci-label">Telefon</span><a href="tel:+420777000000" class="ci-value">+420 777 000 000</a></div>
+        <div class="contact-item"><span class="ci-label">Lokace</span><span class="ci-value">Praha, CZ</span></div>
+      </div>
     </div>
-    <div class="form-group">
-      <label>E-mail</label>
-      <input type="email" placeholder="vas@email.cz" required>
-    </div>
-    <div class="form-group full">
-      <label>Předmět</label>
-      <input type="text" placeholder="Weby, fotografie, spolupráce...">
-    </div>
-    <div class="form-group full">
-      <label>Zpráva</label>
-      <textarea placeholder="Popište váš projekt nebo požadavek..."></textarea>
-    </div>
-    <div class="form-submit">
-      <button type="submit" class="btn btn-primary">Odeslat zprávu</button>
-    </div>
-  </form>
-  <div class="contact-links reveal">
-    <a href="mailto:jan@novak.cz" class="contact-link">✉ jan@novak.cz</a>
-    <a href="tel:+420123456789" class="contact-link">✆ +420 123 456 789</a>
-    <a href="https://linkedin.com" class="contact-link" target="_blank">in LinkedIn</a>
-    <a href="https://github.com" class="contact-link" target="_blank">⌥ GitHub</a>
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-group"><label class="form-label">Jméno</label><input type="text" class="form-input" placeholder="Vaše jméno"></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="vas@email.cz"></div>
+      <div class="form-group"><label class="form-label">Zpráva</label><textarea class="form-textarea" placeholder="Popište váš projekt..."></textarea></div>
+      <button type="submit" class="form-submit">Odeslat zprávu</button>
+    </form>
   </div>
 </section>
 
 <footer>
-  <span>© 2025 Jan Novák</span>
-  <span>Designed &amp; built by JN</span>
+  <p class="footer-copy">© 2026 Jan Novák. Všechna práva vyhrazena.</p>
+  <div class="footer-links">
+    <a href="#">LinkedIn</a><a href="#">Instagram</a><a href="#">GitHub</a>
+    <a href="admin.html" class="footer-admin">·</a>
+  </div>
 </footer>
 
+<div class="modal-overlay" id="article-modal" onclick="closeArticle(event)">
+  <div class="article-modal">
+    <div class="modal-head">
+      <div><div class="modal-meta" id="modal-meta"></div><h2 class="modal-title" id="modal-title"></h2></div>
+      <button class="close-btn" onclick="closeArticleBtn()">×</button>
+    </div>
+    <div class="modal-body"><p id="modal-content"></p></div>
+  </div>
+</div>
+
 <script>
-  const reveals = document.querySelectorAll('.reveal');
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        e.target.querySelectorAll('.skill-fill').forEach(bar => {
-          bar.style.width = bar.dataset.width + '%';
-        });
-        observer.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.15 });
-  reveals.forEach(el => observer.observe(el));
+// ╔══════════════════════════════════════════════════════════╗
+// ║  KONFIGURACE — vyplň po nahrání na GitHub               ║
+// ╚══════════════════════════════════════════════════════════╝
+const GITHUB_USER = 'YOUR_USERNAME';   // tvůj GitHub login
+const GITHUB_REPO = 'YOUR_REPO';       // název repozitáře
+const POSTS_FILE  = 'posts.json';      // soubor s články (root repozitáře)
+// ──────────────────────────────────────────────────────────
 
-  window.addEventListener('scroll', () => {
-    document.querySelector('nav').style.padding =
-      window.scrollY > 60 ? '1rem 4rem' : '1.5rem 4rem';
-  }, { passive: true });
+const configured = GITHUB_USER !== 'YOUR_USERNAME';
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    const btn = e.target.querySelector('button');
-    btn.textContent = 'Odesláno ✓';
-    btn.style.background = '#2a5a2a';
-    btn.style.borderColor = '#2a5a2a';
-    setTimeout(() => {
-      btn.textContent = 'Odeslat zprávu';
-      btn.style.background = '';
-      btn.style.borderColor = '';
-      e.target.reset();
-    }, 3000);
+// raw.githubusercontent.com — žádné rate limity, CDN cache
+const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${POSTS_FILE}`;
+
+const MONTHS = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
+function fmtDate(s){ const d=new Date(s); return `${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
+
+// Fallback ukázkové články pro lokální vývoj
+const DEMO = [
+  {id:1,title:"Jak optimalizovat WordPress pro rychlost",excerpt:"Praktický průvodce optimalizací — od výběru hostingu po lazyloading a cachování.",category:"WordPress",date:"2026-03-12",content:"Toto je ukázkový obsah. Po nastavení GitHub credentials se zobrazí vaše skutečné články z posts.json."},
+  {id:2,title:"Zlatá hodinka — proč fotografovat při soumraku",excerpt:"Světlo ve zlaté hodince mění průměrnou fotografii v umělecké dílo.",category:"Fotografie",date:"2026-02-28",content:"Toto je ukázkový obsah. Po nastavení GitHub credentials se zobrazí vaše skutečné články z posts.json."},
+  {id:3,title:"Joomla vs WordPress v roce 2026",excerpt:"Porovnání dvou CMS gigantů z pohledu vývojáře.",category:"CMS",date:"2026-02-05",content:"Toto je ukázkový obsah. Po nastavení GitHub credentials se zobrazí vaše skutečné články z posts.json."}
+];
+
+async function loadBlog(){
+  const grid = document.getElementById('blog-grid');
+  if(!configured){
+    // Lokální demo — není připojeno ke GitHubu
+    grid.innerHTML = '<div class="demo-notice">⚠ Demo režim — nastav GITHUB_USER a GITHUB_REPO v index.html</div>';
+    renderCards(DEMO, grid, true);
+    return;
   }
+  try{
+    // Cache bust po 1 hodině — návštěvník uvidí nové články do hodiny
+    const v = Math.floor(Date.now()/3_600_000);
+    const r = await fetch(`${RAW_URL}?v=${v}`);
+    if(!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+    const all = await r.json();
+    const posts = all.filter(p=>p.status==='published').sort((a,b)=>new Date(b.date)-new Date(a.date));
+    renderCards(posts, grid, false);
+  }catch(e){
+    grid.innerHTML = `
+      <div class="blog-error">
+        Nepodařilo se načíst <code>posts.json</code> z GitHubu.<br>
+        Zkontroluj hodnoty <code>GITHUB_USER</code> / <code>GITHUB_REPO</code> v index.html<br>
+        a zda soubor <code>posts.json</code> existuje v kořeni repozitáře.<br>
+        <small style="opacity:.6">${e.message}</small>
+      </div>`;
+  }
+}
 
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-  window.addEventListener('scroll', () => {
-    let current = '';
-    sections.forEach(s => { if (window.scrollY >= s.offsetTop - 200) current = s.id; });
-    navLinks.forEach(a => {
-      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--accent)' : '';
+function renderCards(posts, grid, append){
+  if(!posts.length){
+    if(!append) grid.innerHTML = '<p class="blog-empty">Zatím žádné publikované články.</p>';
+    return;
+  }
+  const html = posts.map((p,i)=>`
+    <article class="blog-card reveal" style="transition-delay:${i*.08}s"
+      data-post='${JSON.stringify(p).replace(/'/g,"&#39;")}'>
+      <div style="display:flex;align-items:baseline;flex-wrap:wrap;gap:4px">
+        <span class="blog-date">${fmtDate(p.date)}</span>
+        <span class="blog-cat">${p.category}</span>
+      </div>
+      <h3 class="blog-title">${p.title}</h3>
+      <p class="blog-excerpt">${p.excerpt}</p>
+      <button class="blog-read">Číst <span class="blog-arrow"></span></button>
+    </article>`).join('');
+
+  if(append) grid.innerHTML += html;
+  else grid.innerHTML = html;
+
+  grid.querySelectorAll('.blog-card').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const p = JSON.parse(card.dataset.post);
+      document.getElementById('modal-meta').textContent = `${fmtDate(p.date)} · ${p.category}`;
+      document.getElementById('modal-title').textContent = p.title;
+      document.getElementById('modal-content').textContent = p.content;
+      document.getElementById('article-modal').classList.add('open');
+      document.body.style.overflow='hidden';
     });
-  }, { passive: true });
+  });
+  grid.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+}
+
+function closeArticle(e){ if(e.target===document.getElementById('article-modal')) closeArticleBtn(); }
+function closeArticleBtn(){ document.getElementById('article-modal').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeArticleBtn(); });
+
+const observer = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
+},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+window.addEventListener('scroll',()=>{
+  document.querySelector('nav').style.padding = window.scrollY>60?'14px 48px':'24px 48px';
+},{passive:true});
+
+function handleSubmit(e){
+  e.preventDefault();
+  const btn=e.target.querySelector('.form-submit');
+  btn.textContent='Odesláno ✓';btn.style.background='#4a7c59';
+  setTimeout(()=>{ btn.textContent='Odeslat zprávu';btn.style.background='';e.target.reset(); },3000);
+}
+
+loadBlog();
 </script>
 </body>
 </html>
