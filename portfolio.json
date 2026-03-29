@@ -1,28 +1,26 @@
 [
   {
-    "title": "Test 2",
-    "description": "Testovací projekt 2",
-    "image": "https://raw.githubusercontent.com/wertigocore/wertigocore.github.io/main/images/portfolio/1774786452804.jpeg",
+    "title": "Základní umělecká škola Jana Zacha",
+    "description": "Webová prezentace umělecké školy v Čelákovicích.",
+    "image": "https://raw.githubusercontent.com/wertigocore/wertigocore.github.io/main/images/portfolio/1774812061620.webp",
     "tags": [
-      "WordPress",
-      "Joomla",
-      "Coding"
+      "Joomla"
     ],
-    "link": "",
-    "date": "2026-03-29",
-    "visible": false,
-    "id": 1774786469511
-  },
-  {
-    "title": "Test",
-    "description": "První testovací projekt",
-    "image": "https://raw.githubusercontent.com/wertigocore/wertigocore.github.io/main/images/portfolio/1774786390394.jpeg",
-    "tags": [
-      "CMS"
-    ],
-    "link": "",
+    "link": "https://zuscelakovice.cz/",
     "date": "2026-03-29",
     "visible": true,
-    "id": 1774786319646
+    "id": 1774812062850
+  },
+  {
+    "title": "Web Městské policie hl. m. Prahy",
+    "description": "",
+    "image": "https://raw.githubusercontent.com/wertigocore/wertigocore.github.io/main/images/portfolio/1774810793645.webp",
+    "tags": [
+      "Joomla"
+    ],
+    "link": "https://mppraha.cz/",
+    "date": "2026-03-29",
+    "visible": true,
+    "id": 1774810794979
   }
 ]
