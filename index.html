@@ -7,7 +7,10 @@
 <meta name="description" content="Jan Novák — webový vývojář, Joomla & WordPress specialista a fotograf.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://raw.githubusercontent.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Mono:wght@300;400&display=swap"></noscript>
 <style>
   :root {
     --bg:#0a0a0a;--bg2:#111;--surface:#161616;--border:#222;
@@ -140,6 +143,9 @@
   .footer-admin{color:var(--border)!important}
   .footer-admin:hover{color:var(--muted)!important}
 
+  #back-top{position:fixed;bottom:32px;right:32px;width:44px;height:44px;background:var(--surface);border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s,border-color .2s,color .2s;z-index:90;font-size:20px;line-height:1}
+  #back-top.visible{opacity:1;pointer-events:all;transform:translateY(0)}
+  #back-top:hover{border-color:var(--accent);color:var(--accent)}
   .pf-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
   .pf-btn{padding:6px 18px;border:1px solid var(--border);background:none;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
   .pf-btn:hover,.pf-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(201,169,110,.05)}
@@ -288,6 +294,8 @@
     <a href="admin.html" class="footer-admin">·</a>
   </div>
 </footer>
+
+<button id="back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Zpět nahoru">↑</button>
 
 <div class="modal-overlay" id="pf-modal" onclick="closePfModal(event)">
   <div class="article-modal" style="max-width:800px">
@@ -445,7 +453,7 @@ function renderPfItems(){
   if(!items.length){grid.innerHTML='<p class="pf-empty">Žádné položky v této kategorii.</p>';return;}
   grid.innerHTML=items.map((p,i)=>`
     <div class="portfolio-item reveal" style="transition-delay:${i*.07}s" data-pf='${JSON.stringify(p).replace(/'/g,"&#39;")}'>
-      <div class="portfolio-bg${p.image?'':' portfolio-placeholder'}" style="${p.image?`background-image:url(${p.image})`:'background:linear-gradient(135deg,#1a1510,#0f0e0c)'}">
+      <div class="portfolio-bg${p.image?'':' portfolio-placeholder'}" ${p.image?`data-bg="url(${p.image})"`:'style="background:linear-gradient(135deg,#1a1510,#0f0e0c)"'}>
         ${!p.image?'<div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>':''}
       </div>
       <div class="portfolio-overlay">
@@ -473,12 +481,20 @@ function renderPfItems(){
 }
 
 const observer = new IntersectionObserver(entries=>{
-  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
-},{threshold:.1});
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      const lazyBg=e.target.querySelector('[data-bg]');
+      if(lazyBg){lazyBg.style.backgroundImage=lazyBg.dataset.bg;delete lazyBg.dataset.bg;}
+      observer.unobserve(e.target);
+    }
+  });
+},{threshold:.1,rootMargin:'300px 0px'});
 document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
 window.addEventListener('scroll',()=>{
   document.querySelector('nav').style.padding = window.scrollY>60?'14px 48px':'24px 48px';
+  document.getElementById('back-top').classList.toggle('visible', window.scrollY>500);
 },{passive:true});
 
 function handleSubmit(e){
