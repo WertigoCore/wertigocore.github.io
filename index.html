@@ -140,6 +140,15 @@
   .footer-admin{color:var(--border)!important}
   .footer-admin:hover{color:var(--muted)!important}
 
+  .pf-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px}
+  .pf-btn{padding:6px 18px;border:1px solid var(--border);background:none;color:var(--muted);font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+  .pf-btn:hover,.pf-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(201,169,110,.05)}
+  .pf-loading{color:var(--muted);font-size:12px;letter-spacing:.1em;padding:48px 0;display:flex;align-items:center;gap:12px}
+  .pf-loading::before{content:'';display:inline-block;width:14px;height:14px;border:1px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;flex-shrink:0}
+  .pf-empty{color:var(--muted);font-size:13px;padding:48px 0}
+  .portfolio-item{cursor:pointer}
+  .portfolio-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .6s cubic-bezier(.25,.46,.45,.94)}
+  .portfolio-item:hover .portfolio-bg{transform:scale(1.04)}
   @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
   @keyframes fadeIn{from{opacity:0}to{opacity:1}}
   @keyframes spin{to{transform:rotate(360deg)}}
@@ -234,19 +243,9 @@
       <h2 class="section-title">Portfolio</h2>
       <div class="section-line"></div>
     </div>
-    <div class="portfolio-grid reveal">
-      <div class="portfolio-item">
-        <div class="portfolio-placeholder"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div></div>
-        <div class="portfolio-overlay"><p class="portfolio-label">Fotografie</p><h3 class="portfolio-name">Projekt západ slunce</h3></div>
-      </div>
-      <div class="portfolio-item">
-        <div class="portfolio-placeholder" style="background:linear-gradient(135deg,#101416,#0c0f11)"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div></div>
-        <div class="portfolio-overlay"><p class="portfolio-label">WordPress</p><h3 class="portfolio-name">E-shop — móda</h3></div>
-      </div>
-      <div class="portfolio-item">
-        <div class="portfolio-placeholder" style="background:linear-gradient(135deg,#141210,#0f1410)"><div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="2" y="3" width="20" height="14" rx="1"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div></div>
-        <div class="portfolio-overlay"><p class="portfolio-label">Joomla</p><h3 class="portfolio-name">Komunitní portál</h3></div>
-      </div>
+    <div id="pf-filters" class="pf-filters" style="display:none"></div>
+    <div id="portfolio-grid" class="portfolio-grid">
+      <p class="pf-loading">Načítám portfolio</p>
     </div>
   </div>
 </section>
@@ -290,6 +289,22 @@
   </div>
 </footer>
 
+<div class="modal-overlay" id="pf-modal" onclick="closePfModal(event)">
+  <div class="article-modal" style="max-width:800px">
+    <div id="pf-modal-img" style="width:100%;height:260px;background-size:cover;background-position:center;background-color:var(--surface);flex-shrink:0;display:none"></div>
+    <div class="modal-head">
+      <div><div class="modal-meta" id="pf-modal-tags"></div><h2 class="modal-title" id="pf-modal-title"></h2></div>
+      <button class="close-btn" onclick="closePfModalBtn()">×</button>
+    </div>
+    <div class="modal-body">
+      <p id="pf-modal-desc"></p>
+      <div id="pf-modal-link-wrap" style="margin-top:24px;display:none">
+        <a id="pf-modal-link" href="#" target="_blank" rel="noopener" class="btn-primary" style="display:inline-block">Zobrazit projekt →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="article-modal" onclick="closeArticle(event)">
   <div class="article-modal">
     <div class="modal-head">
@@ -306,13 +321,14 @@
 // ╚══════════════════════════════════════════════════════════╝
 const GITHUB_USER = 'wertigocore';     // tvůj GitHub login
 const GITHUB_REPO = 'wertigocore.github.io'; // název repozitáře
-const POSTS_FILE  = 'posts.json';      // soubor s články (root repozitáře)
+const POSTS_FILE      = 'posts.json';
+const PORTFOLIO_FILE  = 'portfolio.json';
 // ──────────────────────────────────────────────────────────
 
 const configured = GITHUB_USER !== 'YOUR_USERNAME';
 
-// raw.githubusercontent.com — žádné rate limity, CDN cache
-const RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${POSTS_FILE}`;
+const RAW_URL           = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${POSTS_FILE}`;
+const PORTFOLIO_RAW_URL = `https://raw.githubusercontent.com/${GITHUB_USER}/${GITHUB_REPO}/main/${PORTFOLIO_FILE}`;
 
 const MONTHS = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
 function fmtDate(s){ const d=new Date(s); return `${d.getDate()}. ${MONTHS[d.getMonth()]} ${d.getFullYear()}`; }
@@ -386,7 +402,75 @@ function renderCards(posts, grid, append){
 
 function closeArticle(e){ if(e.target===document.getElementById('article-modal')) closeArticleBtn(); }
 function closeArticleBtn(){ document.getElementById('article-modal').classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeArticleBtn(); });
+function closePfModal(e){ if(e.target===document.getElementById('pf-modal')) closePfModalBtn(); }
+function closePfModalBtn(){ document.getElementById('pf-modal').classList.remove('open'); document.body.style.overflow=''; }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeArticleBtn(); closePfModalBtn(); } });
+
+// ── Portfolio ────────────────────────────────────────────────
+let pfActiveTag='all';
+let pfAllItems=[];
+
+async function loadPortfolio(){
+  const grid=document.getElementById('portfolio-grid');
+  if(!configured){grid.innerHTML='';return;}
+  try{
+    const v=Math.floor(Date.now()/300_000);
+    const r=await fetch(`${PORTFOLIO_RAW_URL}?v=${v}`,{cache:'no-store'});
+    if(!r.ok)throw new Error(`${r.status}`);
+    pfAllItems=(await r.json()).filter(p=>p.visible!==false);
+    renderPfFilters();
+    renderPfItems();
+  }catch(e){
+    grid.innerHTML=''; // portfolio není povinné — tiché selhání
+  }
+}
+
+function renderPfFilters(){
+  const el=document.getElementById('pf-filters');
+  const tags=['all',...new Set(pfAllItems.flatMap(p=>p.tags||[]))].filter(Boolean);
+  if(tags.length<=2){el.style.display='none';return;}
+  el.style.display='flex';
+  el.innerHTML=tags.map(t=>`<button class="pf-btn${t===pfActiveTag?' active':''}" onclick="pfFilter('${t.replace(/'/g,'&#39;')}')">${t==='all'?'Vše':t}</button>`).join('');
+}
+
+function pfFilter(tag){
+  pfActiveTag=tag;
+  document.querySelectorAll('.pf-btn').forEach(b=>b.classList.toggle('active',b.textContent.trim()===(tag==='all'?'Vše':tag)));
+  renderPfItems();
+}
+
+function renderPfItems(){
+  const grid=document.getElementById('portfolio-grid');
+  const items=pfActiveTag==='all'?pfAllItems:pfAllItems.filter(p=>(p.tags||[]).includes(pfActiveTag));
+  if(!items.length){grid.innerHTML='<p class="pf-empty">Žádné položky v této kategorii.</p>';return;}
+  grid.innerHTML=items.map((p,i)=>`
+    <div class="portfolio-item reveal" style="transition-delay:${i*.07}s" data-pf='${JSON.stringify(p).replace(/'/g,"&#39;")}'>
+      <div class="portfolio-bg${p.image?'':' portfolio-placeholder'}" style="${p.image?`background-image:url(${p.image})`:'background:linear-gradient(135deg,#1a1510,#0f0e0c)'}">
+        ${!p.image?'<div class="portfolio-icon"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="0.8"><rect x="3" y="3" width="18" height="18" rx="1"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg></div>':''}
+      </div>
+      <div class="portfolio-overlay">
+        <p class="portfolio-label">${(p.tags||[]).join(' · ')}</p>
+        <h3 class="portfolio-name">${p.title}</h3>
+      </div>
+    </div>`).join('');
+  grid.querySelectorAll('.portfolio-item').forEach(card=>{
+    card.addEventListener('click',()=>{
+      const p=JSON.parse(card.dataset.pf);
+      const imgEl=document.getElementById('pf-modal-img');
+      if(p.image){imgEl.style.backgroundImage=`url(${p.image})`;imgEl.style.display='block';}
+      else{imgEl.style.display='none';}
+      document.getElementById('pf-modal-tags').textContent=(p.tags||[]).join(' · ');
+      document.getElementById('pf-modal-title').textContent=p.title;
+      document.getElementById('pf-modal-desc').textContent=p.description||'';
+      const lw=document.getElementById('pf-modal-link-wrap');
+      if(p.link){lw.style.display='block';document.getElementById('pf-modal-link').href=p.link;}
+      else{lw.style.display='none';}
+      document.getElementById('pf-modal').classList.add('open');
+      document.body.style.overflow='hidden';
+    });
+  });
+  grid.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+}
 
 const observer = new IntersectionObserver(entries=>{
   entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); } });
@@ -405,6 +489,7 @@ function handleSubmit(e){
 }
 
 loadBlog();
+loadPortfolio();
 </script>
 </body>
 </html>

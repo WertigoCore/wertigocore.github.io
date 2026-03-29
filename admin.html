@@ -36,6 +36,7 @@ const CONFIG = {
   repo: 'wertigocore.github.io',       // ← název repozitáře
   file: 'posts.json',      // soubor v kořeni repozitáře
   branch: 'main',
+  portfolioFile: 'portfolio.json',
 };
 // ────────────────────────────────────────────────────────────
 
@@ -84,6 +85,46 @@ async function savePostsToGitHub(posts, sha, token){
   const json = JSON.stringify(posts, null, 2);
   const now = new Date().toISOString().slice(0,16).replace('T',' ');
   return ghPut(CONFIG.file, json, sha, token, `Blog update ${now}`);
+}
+
+// ── Portfolio API helpers ─────────────────────────────────────
+async function loadPortfolioFromGitHub(token){
+  try{
+    const data=await ghGet(CONFIG.portfolioFile,token);
+    const json=decodeURIComponent(escape(atob(data.content.replace(/\n/g,''))));
+    return{items:JSON.parse(json),sha:data.sha};
+  }catch(e){
+    if(e.message.includes('404'))return{items:[],sha:null};
+    throw e;
+  }
+}
+
+async function savePortfolioToGitHub(items,sha,token){
+  const json=JSON.stringify(items,null,2);
+  const now=new Date().toISOString().slice(0,16).replace('T',' ');
+  return ghPut(CONFIG.portfolioFile,json,sha,token,`Portfolio update ${now}`);
+}
+
+async function uploadImageToGitHub(file,token){
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      try{
+        const base64=e.target.result.split(',')[1];
+        const ext=file.name.split('.').pop().toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+        const filename=`${Date.now()}.${ext}`;
+        const path=`images/portfolio/${filename}`;
+        const r=await fetch(`https://api.github.com/repos/${CONFIG.user}/${CONFIG.repo}/contents/${path}`,{
+          method:'PUT',
+          headers:{Authorization:`token ${token}`,Accept:'application/vnd.github.v3+json','Content-Type':'application/json'},
+          body:JSON.stringify({message:`Upload: ${filename}`,content:base64,branch:CONFIG.branch})
+        });
+        if(!r.ok)throw new Error(`Upload ${r.status}: ${await r.text()}`);
+        resolve(`https://raw.githubusercontent.com/${CONFIG.user}/${CONFIG.repo}/main/${path}`);
+      }catch(err){reject(err);}
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 // ── Styles ───────────────────────────────────────────────────
@@ -274,6 +315,172 @@ function ConfirmModal({title,onConfirm,onClose,saving}){
   );
 }
 
+// ── Portfolio Item Modal ─────────────────────────────────────
+function PortfolioModal({item,onSave,onClose,saving,token}){
+  const empty={title:'',description:'',image:'',tags:[],link:'',date:new Date().toISOString().slice(0,10),visible:true};
+  const [form,setForm]=useState(item?{...item,tags:[...(item.tags||[])]}:empty);
+  const [tagInput,setTagInput]=useState('');
+  const [uploading,setUploading]=useState(false);
+  const [err,setErr]=useState('');
+  const fileRef=useRef(null);
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  const addTag=val=>{const t=val.trim();if(t&&!form.tags.includes(t))setForm(f=>({...f,tags:[...f.tags,t]}));setTagInput('');};
+  const removeTag=t=>setForm(f=>({...f,tags:f.tags.filter(x=>x!==t)}));
+  const handleTagKey=e=>{
+    if(e.key==='Enter'||e.key===','){e.preventDefault();addTag(tagInput);}
+    if(e.key==='Backspace'&&!tagInput&&form.tags.length)removeTag(form.tags[form.tags.length-1]);
+  };
+
+  const handleUpload=async e=>{
+    const file=e.target.files[0];if(!file)return;
+    setUploading(true);setErr('');
+    try{const url=await uploadImageToGitHub(file,token);set('image',url);}
+    catch(ex){setErr(`Chyba nahrávání: ${ex.message}`);}
+    finally{setUploading(false);e.target.value='';}
+  };
+
+  const submit=()=>{
+    if(!form.title.trim()){setErr('Název nesmí být prázdný.');return;}
+    const finalForm={...form};
+    if(tagInput.trim()&&!finalForm.tags.includes(tagInput.trim()))finalForm.tags=[...finalForm.tags,tagInput.trim()];
+    onSave(finalForm);
+  };
+
+  return(
+    <div style={S.modalOverlay} onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div style={{...S.modal,maxWidth:760}}>
+        <div style={S.modalHead}>
+          <span style={{fontFamily:'var(--serif)',fontSize:24,fontWeight:300}}>{item?'Upravit položku':'Nová položka portfolia'}</span>
+          <button style={S.closeBtn} onClick={onClose}>×</button>
+        </div>
+        <div style={S.modalBody}>
+          {err&&<div style={{color:'var(--danger)',fontSize:12,marginBottom:16,padding:'10px 14px',border:'1px solid rgba(192,57,43,.3)'}}>{err}</div>}
+          <div style={S.fGroup}>
+            <label style={S.label}>Název *</label>
+            <input style={S.input} value={form.title} onChange={e=>{set('title',e.target.value);setErr('');}} placeholder="Název projektu..."/>
+          </div>
+          <div style={S.fGroup}>
+            <label style={S.label}>Popis</label>
+            <textarea style={{...S.textarea,minHeight:80}} value={form.description} onChange={e=>set('description',e.target.value)} placeholder="Krátký popis projektu..."/>
+          </div>
+          <div style={S.fGroup}>
+            <label style={S.label}>Obrázek</label>
+            {form.image&&(
+              <div style={{marginTop:8,marginBottom:8,height:120,backgroundImage:`url(${form.image})`,backgroundSize:'cover',backgroundPosition:'center',border:'1px solid var(--border)',position:'relative'}}>
+                <button onClick={()=>set('image','')} style={{position:'absolute',top:6,right:6,background:'rgba(0,0,0,.75)',border:'none',color:'#fff',width:22,height:22,cursor:'pointer',fontSize:14,lineHeight:'22px',textAlign:'center'}}>×</button>
+              </div>
+            )}
+            <div style={{display:'flex',gap:8,marginTop:8}}>
+              <input style={{...S.input,marginTop:0,flex:1}} value={form.image} onChange={e=>set('image',e.target.value)} placeholder="https://... nebo nahraj soubor →"/>
+              <button style={{...S.btnGhost,flexShrink:0,opacity:uploading?.6:1}} onClick={()=>fileRef.current.click()} disabled={uploading}>
+                {uploading?'Nahrávám…':'↑ Nahrát'}
+              </button>
+              <input ref={fileRef} type="file" accept="image/*" style={{display:'none'}} onChange={handleUpload}/>
+            </div>
+          </div>
+          <div style={S.fGroup}>
+            <label style={S.label}>Tagy</label>
+            <div style={{display:'flex',flexWrap:'wrap',alignItems:'center',gap:6,padding:'8px 12px',background:'var(--bg)',border:'1px solid var(--border)',marginTop:8,minHeight:44,cursor:'text'}}
+              onClick={()=>document.getElementById('pf-tag-input').focus()}>
+              {form.tags.map(t=>(
+                <span key={t} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'3px 10px',background:'rgba(201,169,110,.1)',border:'1px solid rgba(201,169,110,.25)',color:'var(--accent)',fontSize:11,letterSpacing:'.05em'}}>
+                  {t}
+                  <button onClick={e=>{e.stopPropagation();removeTag(t);}} style={{background:'none',border:'none',color:'var(--accent)',cursor:'pointer',padding:0,fontSize:13,lineHeight:1,marginLeft:2}}>×</button>
+                </span>
+              ))}
+              <input id="pf-tag-input"
+                style={{background:'none',border:'none',outline:'none',color:'var(--text)',fontFamily:'var(--mono)',fontSize:12,minWidth:140,flex:1,padding:0}}
+                value={tagInput} onChange={e=>setTagInput(e.target.value)} onKeyDown={handleTagKey}
+                onBlur={()=>tagInput.trim()&&addTag(tagInput)}
+                placeholder={form.tags.length===0?'WordPress, Fotografie, … (Enter nebo čárka)':''}/>
+            </div>
+          </div>
+          <div style={S.fGrid}>
+            <div>
+              <label style={S.label}>Odkaz na projekt</label>
+              <input style={S.input} value={form.link} onChange={e=>set('link',e.target.value)} placeholder="https://..."/>
+            </div>
+            <div>
+              <label style={S.label}>Datum</label>
+              <input type="date" style={S.input} value={form.date} onChange={e=>set('date',e.target.value)}/>
+            </div>
+          </div>
+          <div style={{display:'flex',alignItems:'center',gap:12}}>
+            <label style={{...S.label,marginBottom:0}}>Zobrazit na webu</label>
+            <div style={{position:'relative',width:36,height:20,background:form.visible!==false?'rgba(201,169,110,.35)':'var(--border)',borderRadius:10,cursor:'pointer',transition:'background .2s',flexShrink:0}}
+              onClick={()=>set('visible',form.visible===false)}>
+              <div style={{position:'absolute',top:2,left:form.visible!==false?18:2,width:16,height:16,background:form.visible!==false?'var(--accent)':'var(--muted)',borderRadius:'50%',transition:'left .2s'}}/>
+            </div>
+            <span style={{fontSize:11,color:'var(--muted)'}}>{form.visible!==false?'Viditelné':'Skryto'}</span>
+          </div>
+        </div>
+        <div style={S.modalFoot}>
+          <span style={{fontSize:11,color:'var(--muted)'}}>{form.tags.length} {form.tags.length===1?'tag':'tagů'}</span>
+          <div style={{display:'flex',gap:10}}>
+            <button style={S.btnGhost} onClick={onClose} disabled={saving||uploading}>Zrušit</button>
+            <button style={{...S.btnPrimary,opacity:(saving||uploading)?.6:1}} onClick={submit} disabled={saving||uploading}>
+              {saving?'Ukládám…':'Uložit'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Portfolio list ────────────────────────────────────────────
+function PortfolioList({items,onNew,onEdit,onDelete,loading}){
+  if(loading) return <div style={{color:'var(--muted)',fontSize:12,padding:48,textAlign:'center',letterSpacing:'.1em'}}>Načítám portfolio…</div>;
+  return(
+    <div>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:24}}>
+        <div style={{fontSize:11,color:'var(--muted)',letterSpacing:'.1em',textTransform:'uppercase'}}>{items.length} položek</div>
+        <button style={S.btnPrimary} onClick={onNew}>+ Nová položka</button>
+      </div>
+      <div style={{background:'var(--surface)',border:'1px solid var(--border)'}}>
+        <table style={S.table}>
+          <thead><tr>
+            <th style={S.th}>Náhled</th><th style={S.th}>Název</th><th style={S.th}>Tagy</th>
+            <th style={S.th}>Datum</th><th style={S.th}>Viditelnost</th><th style={S.th}>Akce</th>
+          </tr></thead>
+          <tbody>
+            {items.length===0&&<tr><td colSpan={6} style={{...S.td,textAlign:'center',color:'var(--muted)',padding:40}}>Zatím žádné položky. Vytvořte první →</td></tr>}
+            {items.map(p=>(
+              <tr key={p.id}>
+                <td style={{...S.td,width:64}}>
+                  {p.image
+                    ?<div style={{width:48,height:36,backgroundImage:`url(${p.image})`,backgroundSize:'cover',backgroundPosition:'center',border:'1px solid var(--border)'}}/>
+                    :<div style={{width:48,height:36,background:'var(--bg)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--border)',fontSize:18}}>▦</div>
+                  }
+                </td>
+                <td style={S.td}>
+                  <div style={{fontWeight:400}}>{p.title}</div>
+                  {p.description&&<div style={{fontSize:11,color:'var(--muted)',marginTop:2}}>{p.description.slice(0,55)}{p.description.length>55?'…':''}</div>}
+                </td>
+                <td style={S.td}>
+                  <div style={{display:'flex',flexWrap:'wrap',gap:4}}>
+                    {(p.tags||[]).slice(0,3).map(t=><span key={t} style={{fontSize:9,padding:'2px 8px',border:'1px solid rgba(201,169,110,.2)',color:'var(--accent)',letterSpacing:'.1em',textTransform:'uppercase',whiteSpace:'nowrap'}}>{t}</span>)}
+                    {(p.tags||[]).length>3&&<span style={{fontSize:9,color:'var(--muted)'}}>+{p.tags.length-3}</span>}
+                  </div>
+                </td>
+                <td style={{...S.td,color:'var(--muted)',whiteSpace:'nowrap'}}>{p.date}</td>
+                <td style={S.td}><span style={S.badge(p.visible!==false?'published':'draft')}>{p.visible!==false?'Viditelné':'Skryto'}</span></td>
+                <td style={S.td}>
+                  <div style={{display:'flex',gap:6}}>
+                    <button style={S.btnGhost} onClick={()=>onEdit(p)}>Upravit</button>
+                    <button style={S.btnDanger} onClick={()=>onDelete(p)}>✕</button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 // ── Dashboard ────────────────────────────────────────────────
 function Dashboard({posts,onNew,setPage}){
   const pub=posts.filter(p=>p.status==='published');
@@ -376,8 +583,25 @@ function App(){
   const [editPost,setEditPost]=useState(null);
   const [deletePost,setDeletePost]=useState(null);
   const [toast,setToast]=useState(null);
+  const [portfolio,setPortfolio]=useState([]);
+  const [portfolioSha,setPortfolioSha]=useState(null);
+  const [portfolioLoaded,setPortfolioLoaded]=useState(false);
+  const [portfolioLoading,setPortfolioLoading]=useState(false);
+  const [editPortfolioItem,setEditPortfolioItem]=useState(null);
+  const [deletePortfolioItem,setDeletePortfolioItem]=useState(null);
 
   const toast$=(msg,type='ok')=>setToast({msg,type});
+
+  // Lazy load portfolio when navigating to portfolio page
+  useEffect(()=>{
+    if(page==='portfolio'&&token&&!portfolioLoaded){
+      setPortfolioLoading(true);
+      loadPortfolioFromGitHub(token)
+        .then(({items,sha})=>{setPortfolio(items);setPortfolioSha(sha);setPortfolioLoaded(true);})
+        .catch(e=>toast$(`Chyba při načítání portfolia: ${e.message}`,'error'))
+        .finally(()=>setPortfolioLoading(false));
+    }
+  },[page,token,portfolioLoaded]);
 
   // Load posts after login
   const connect=useCallback(async(t)=>{
@@ -432,7 +656,32 @@ function App(){
     toast$('Článek smazán.','error');
   },[posts,deletePost,persist]);
 
-  const logout=()=>{setToken('');setPosts([]);setSha(null);};
+  const persistPortfolio=useCallback(async newItems=>{
+    setSaving(true);toast$('Ukládám do GitHubu…','saving');
+    try{
+      const result=await savePortfolioToGitHub(newItems,portfolioSha,token);
+      setPortfolioSha(result.content.sha);setPortfolio(newItems);
+      toast$('✓ Portfolio uloženo.');
+    }catch(e){toast$(`Chyba: ${e.message}`,'error');}
+    finally{setSaving(false);}
+  },[portfolioSha,token]);
+
+  const handlePortfolioSave=useCallback(async form=>{
+    const newItems=editPortfolioItem
+      ?portfolio.map(p=>p.id===editPortfolioItem.id?{...p,...form}:p)
+      :[{...form,id:Date.now()},...portfolio];
+    setModal(null);setEditPortfolioItem(null);
+    await persistPortfolio(newItems);
+  },[editPortfolioItem,portfolio,persistPortfolio]);
+
+  const handlePortfolioDelete=useCallback(async()=>{
+    const newItems=portfolio.filter(p=>p.id!==deletePortfolioItem.id);
+    setModal(null);setDeletePortfolioItem(null);
+    await persistPortfolio(newItems);
+    toast$('Položka smazána.','error');
+  },[portfolio,deletePortfolioItem,persistPortfolio]);
+
+  const logout=()=>{setToken('');setPosts([]);setSha(null);setPortfolio([]);setPortfolioSha(null);setPortfolioLoaded(false);};
 
   if(!token) return(
     <>{loading&&<div style={{position:'fixed',inset:0,background:'rgba(0,0,0,.5)',display:'flex',alignItems:'center',justifyContent:'center',zIndex:9999,fontSize:12,color:'var(--muted)',letterSpacing:'0.1em'}}>Načítám…</div>}
@@ -449,7 +698,7 @@ function App(){
           <div style={{fontSize:10,letterSpacing:'0.15em',color:'var(--muted)',textTransform:'uppercase'}}>Blog Admin</div>
         </div>
         <nav style={{padding:'16px 0',flex:1}}>
-          {[{key:'dashboard',icon:'▦',label:'Přehled'},{key:'posts',icon:'≡',label:'Články'}].map(item=>(
+          {[{key:'dashboard',icon:'▦',label:'Přehled'},{key:'posts',icon:'≡',label:'Články'},{key:'portfolio',icon:'◫',label:'Portfolio'}].map(item=>(
             <div key={item.key} style={S.navItem(page===item.key)} onClick={()=>setPage(item.key)}>
               <span style={{fontSize:14,opacity:.8}}>{item.icon}</span>
               <span>{item.label}</span>
@@ -470,21 +719,25 @@ function App(){
       <div style={S.main}>
         <div style={S.topbar}>
           <div>
-            <div style={S.topbarTitle}>{page==='dashboard'?'Přehled':'Správa článků'}</div>
+            <div style={S.topbarTitle}>{page==='dashboard'?'Přehled':page==='posts'?'Správa článků':'Portfolio'}</div>
             <div style={{fontSize:11,color:'var(--muted)',marginTop:2,letterSpacing:'0.1em'}}>
               {CONFIG.user}/{CONFIG.repo} · {new Date().toLocaleDateString('cs-CZ')}
             </div>
           </div>
           {page==='posts'&&<button style={S.btnPrimary} onClick={()=>{setEditPost(null);setModal('edit')}}>+ Nový článek</button>}
+          {page==='portfolio'&&<button style={S.btnPrimary} onClick={()=>{setEditPortfolioItem(null);setModal('portfolioEdit')}}>+ Nová položka</button>}
         </div>
         <div style={S.content}>
           {page==='dashboard'&&<Dashboard posts={posts} onNew={()=>{setEditPost(null);setModal('edit')}} setPage={setPage}/>}
           {page==='posts'&&<Posts posts={posts} onNew={()=>{setEditPost(null);setModal('edit')}} onEdit={p=>{setEditPost(p);setModal('edit')}} onDelete={p=>{setDeletePost(p);setModal('delete')}} onToggle={handleToggle}/>}
+          {page==='portfolio'&&<PortfolioList items={portfolio} onNew={()=>{setEditPortfolioItem(null);setModal('portfolioEdit')}} onEdit={p=>{setEditPortfolioItem(p);setModal('portfolioEdit')}} onDelete={p=>{setDeletePortfolioItem(p);setModal('portfolioDelete')}} loading={portfolioLoading}/>}
         </div>
       </div>
 
       {modal==='edit'&&<PostModal post={editPost} onSave={handleSave} onClose={()=>{setModal(null);setEditPost(null)}} saving={saving}/>}
       {modal==='delete'&&deletePost&&<ConfirmModal title={deletePost.title} onConfirm={handleDeleteConfirm} onClose={()=>{setModal(null);setDeletePost(null)}} saving={saving}/>}
+      {modal==='portfolioEdit'&&<PortfolioModal item={editPortfolioItem} onSave={handlePortfolioSave} onClose={()=>{setModal(null);setEditPortfolioItem(null)}} saving={saving} token={token}/>}
+      {modal==='portfolioDelete'&&deletePortfolioItem&&<ConfirmModal title={deletePortfolioItem.title} onConfirm={handlePortfolioDelete} onClose={()=>{setModal(null);setDeletePortfolioItem(null)}} saving={saving}/>}
       {toast&&<Toast msg={toast.msg} type={toast.type} onClose={()=>setToast(null)}/>}
     </>
   );
