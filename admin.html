@@ -349,7 +349,7 @@ function PortfolioModal({item,onSave,onClose,saving,token}){
     setScreenshotLoading(true);setErr('');
     (async()=>{
       try{
-        const r=await fetch(`https://image.thum.io/get/width/1200/crop/900/noanimate/${encodeURIComponent(form.link)}`);
+        const r=await fetch(`https://image.thum.io/get/width/1200/crop/900/noanimate/${form.link}`);
         if(!r.ok)throw new Error(`HTTP ${r.status}`);
         const blob=await r.blob();
         if(cancelled)return;
