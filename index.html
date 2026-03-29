@@ -14,7 +14,7 @@
 <style>
   :root {
     --bg:#0a0a0a;--bg2:#111;--surface:#161616;--border:#222;
-    --accent:#c9a96e;--accent2:#e8d5b0;--text:#e8e4dc;--muted:#6b6660;
+    --accent:#c9a96e;--accent2:#e8d5b0;--text:#e8e4dc;--muted:#908b85;
     --serif:'Cormorant Garamond',Georgia,serif;--mono:'DM Mono',monospace;
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -161,21 +161,39 @@
   .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
   .reveal.visible{opacity:1;transform:translateY(0)}
 
+  .nav-burger{display:none;background:none;border:none;cursor:pointer;padding:4px;flex-direction:column;gap:5px;z-index:101;position:relative}
+  .nav-burger span{display:block;width:22px;height:1px;background:var(--text);transition:transform .3s,opacity .3s}
+  .nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .nav-burger.open span:nth-child(2){opacity:0}
+  .nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  .mobile-menu{position:fixed;inset:0;background:rgba(10,10,10,.97);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:40px;opacity:0;pointer-events:none;transition:opacity .3s}
+  .mobile-menu.open{opacity:1;pointer-events:all}
+  .mobile-menu a{font-family:var(--serif);font-size:42px;font-weight:300;color:var(--text);text-decoration:none;letter-spacing:.02em;transition:color .2s}
+  .mobile-menu a:hover,.mobile-menu a:active{color:var(--accent)}
+  .mobile-menu .mob-cta{color:var(--accent)!important}
+
   @media(max-width:900px){
+    body{font-size:14px;line-height:1.75}
     nav{padding:20px 24px}
     .nav-links{display:none}
-    #hero{grid-template-columns:1fr}
-    .hero-right{display:none}
-    .hero-left{padding:120px 24px 80px}
-    section{padding:80px 24px}
+    .nav-burger{display:flex}
+    #hero{grid-template-columns:1fr;grid-template-rows:auto auto}
+    .hero-right{display:block;height:340px;order:0}
+    .hero-photo-frame{width:200px;height:264px}
+    .hero-photo-frame::before{display:none}
+    .hero-left{padding:48px 24px 64px;order:1}
+    .hero-title{font-size:clamp(52px,14vw,72px)}
+    section{padding:72px 24px}
     .services-grid{grid-template-columns:1fr}
     .portfolio-grid{grid-template-columns:1fr}
     .portfolio-item:first-child{grid-column:span 1;aspect-ratio:4/3}
     .blog-grid{grid-template-columns:1fr}
+    .blog-excerpt{font-size:13px}
     .contact-inner{grid-template-columns:1fr;gap:48px}
     footer{flex-direction:column;gap:16px;text-align:center}
     .article-modal{width:96%}
-    .modal-head,.modal-body{padding:24px}
+    .modal-head,.modal-body{padding:20px 24px}
+    #back-top{bottom:20px;right:20px;width:40px;height:40px}
   }
 </style>
 </head>
@@ -189,7 +207,17 @@
     <li><a href="#blog">Blog</a></li>
     <li><a href="#contact" class="nav-cta">Kontakt</a></li>
   </ul>
+  <button class="nav-burger" id="nav-burger" aria-label="Menu" onclick="toggleMobileMenu()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#services" onclick="closeMobileMenu()">Služby</a>
+  <a href="#portfolio" onclick="closeMobileMenu()">Portfolio</a>
+  <a href="#blog" onclick="closeMobileMenu()">Blog</a>
+  <a href="#contact" onclick="closeMobileMenu()" class="mob-cta">Kontakt</a>
+</div>
 
 <section id="hero" style="max-width:100%;padding:0">
   <div class="hero-left">
@@ -405,11 +433,22 @@ function renderCards(posts, grid, append){
   grid.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 }
 
+function toggleMobileMenu(){
+  const open=document.getElementById('mobile-menu').classList.toggle('open');
+  document.getElementById('nav-burger').classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileMenu(){
+  document.getElementById('mobile-menu').classList.remove('open');
+  document.getElementById('nav-burger').classList.remove('open');
+  document.body.style.overflow='';
+}
+
 function closeArticle(e){ if(e.target===document.getElementById('article-modal')) closeArticleBtn(); }
 function closeArticleBtn(){ document.getElementById('article-modal').classList.remove('open'); document.body.style.overflow=''; }
 function closePfModal(e){ if(e.target===document.getElementById('pf-modal')) closePfModalBtn(); }
 function closePfModalBtn(){ document.getElementById('pf-modal').classList.remove('open'); document.body.style.overflow=''; }
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeArticleBtn(); closePfModalBtn(); } });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeArticleBtn(); closePfModalBtn(); closeMobileMenu(); } });
 
 // ── Portfolio ────────────────────────────────────────────────
 let pfActiveTag='all';
