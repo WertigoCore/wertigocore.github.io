@@ -134,6 +134,9 @@
   .form-textarea{min-height:140px}
   .form-submit{align-self:flex-start;padding:16px 40px;background:var(--accent);color:var(--bg);border:none;font-family:var(--mono);font-size:11px;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .3s,transform .2s}
   .form-submit:hover{background:var(--accent2);transform:translateY(-2px)}
+  .form-submit:disabled{opacity:.6;cursor:default;transform:none}
+  .hp-field{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none}
+  .form-error{color:var(--danger,#c0392b);font-size:12px;margin-top:-8px}
 
   footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify-content:space-between;align-items:center}
   .footer-copy{font-size:11px;color:var(--muted);letter-spacing:.1em}
@@ -304,9 +307,10 @@
       </div>
     </div>
     <form class="contact-form" onsubmit="handleSubmit(event)">
-      <div class="form-group"><label class="form-label">Jméno</label><input type="text" class="form-input" placeholder="Vaše jméno"></div>
-      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="vas@email.cz"></div>
-      <div class="form-group"><label class="form-label">Zpráva</label><textarea class="form-textarea" placeholder="Popište váš projekt..."></textarea></div>
+      <div class="form-group"><label class="form-label">Jméno</label><input type="text" name="name" class="form-input" placeholder="Vaše jméno" required></div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" name="email" class="form-input" placeholder="vas@email.cz" required></div>
+      <div class="form-group"><label class="form-label">Zpráva</label><textarea name="message" class="form-textarea" placeholder="Popište váš projekt..." required></textarea></div>
+      <input type="text" name="website" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
       <button type="submit" class="form-submit">Odeslat zprávu</button>
     </form>
   </div>
@@ -533,11 +537,40 @@ window.addEventListener('scroll',()=>{
   document.getElementById('back-top').classList.toggle('visible', window.scrollY>500);
 },{passive:true});
 
-function handleSubmit(e){
+async function handleSubmit(e){
   e.preventDefault();
-  const btn=e.target.querySelector('.form-submit');
-  btn.textContent='Odesláno ✓';btn.style.background='#4a7c59';
-  setTimeout(()=>{ btn.textContent='Odeslat zprávu';btn.style.background='';e.target.reset(); },3000);
+  const form=e.target;
+  const btn=form.querySelector('.form-submit');
+  const prevErr=form.querySelector('.form-error');
+  if(prevErr)prevErr.remove();
+
+  const data={
+    name:form.name.value.trim(),
+    email:form.email.value.trim(),
+    message:form.message.value.trim(),
+    website:form.website.value // honeypot
+  };
+
+  btn.disabled=true;btn.textContent='Odesílám…';
+  try{
+    const r=await fetch('contact.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(data)
+    });
+    const result=await r.json().catch(()=>({ok:false,error:'bad_response'}));
+    if(!r.ok||!result.ok)throw new Error(result.error||`HTTP ${r.status}`);
+
+    btn.textContent='Odesláno ✓';btn.style.background='#4a7c59';
+    form.reset();
+    setTimeout(()=>{ btn.textContent='Odeslat zprávu';btn.style.background='';btn.disabled=false; },3000);
+  }catch(err){
+    btn.textContent='Odeslat zprávu';btn.disabled=false;
+    const p=document.createElement('p');
+    p.className='form-error';
+    p.textContent='Zprávu se nepodařilo odeslat. Zkuste to prosím znovu nebo pište na novak@nova-design.cz.';
+    btn.insertAdjacentElement('beforebegin',p);
+  }
 }
 
 loadBlog();
