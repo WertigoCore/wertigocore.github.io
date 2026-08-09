@@ -4,3 +4,7 @@
 <Files "config.local.php">
     Require all denied
 </Files>
+
+RewriteEngine On
+RewriteRule ^clanek/([a-z0-9-]+)/?$ clanek.php?slug=$1 [L,QSA]
+RewriteRule ^sitemap\.xml$ sitemap.php [L]

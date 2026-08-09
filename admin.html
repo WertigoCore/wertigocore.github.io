@@ -42,6 +42,20 @@ const CONFIG = {
 
 const CATEGORIES = ['WordPress','Joomla','Fotografie','CMS','Development','Ostatní'];
 
+const DIACRITICS_MAP = {á:'a',č:'c',ď:'d',é:'e',ě:'e',í:'i',ň:'n',ó:'o',ř:'r',š:'s',ť:'t',ú:'u',ů:'u',ý:'y',ž:'z'};
+function slugify(str){
+  return str.toLowerCase()
+    .replace(/[áčďéěíňóřšťúůýž]/g, ch => DIACRITICS_MAP[ch] || ch)
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+function uniqueSlug(base, existingSlugs){
+  let slug = base || 'clanek';
+  let i = 2;
+  while(existingSlugs.includes(slug)) slug = `${base}-${i++}`;
+  return slug;
+}
+
 const DEFAULT_POSTS = [
   {id:1,title:"Jak optimalizovat WordPress pro rychlost",excerpt:"Praktický průvodce optimalizací — od výběru hostingu po lazyloading a cachování.",category:"WordPress",date:"2026-03-12",status:"published",content:"Rychlost načítání webu je dnes jedním z nejdůležitějších faktorů jak pro uživatelský zážitek, tak pro SEO.\n\nZákladem je správný hosting — vyberte server co nejblíže vašim návštěvníkům a preferujte NVMe SSD storage.\n\nDále se zaměřte na obrázky: převeďte je do formátu WebP, nastavte lazy loading a použijte CDN. Samotné obrázky tvoří typicky 60–80 % váhy stránky."},
   {id:2,title:"Zlatá hodinka — proč fotografovat při soumraku",excerpt:"Světlo ve zlaté hodince mění průměrnou fotografii v umělecké dílo.",category:"Fotografie",date:"2026-02-28",status:"published",content:"Zlatá hodinka nastává přibližně hodinu po východu a hodinu před západem slunce. V tuto dobu je světlo měkké, teplé a přichází ze strany.\n\nPraktický tip: Naplánujte focení s předstihem pomocí aplikace PhotoPills. Přijďte na místo aspoň 20 minut předem."},
@@ -705,9 +719,11 @@ function App(){
   const handleSave=useCallback(async(form)=>{
     let newPosts;
     if(editPost){
-      newPosts=posts.map(p=>p.id===editPost.id?{...p,...form}:p);
+      const slug=editPost.slug||uniqueSlug(slugify(form.title),posts.filter(p=>p.id!==editPost.id).map(p=>p.slug).filter(Boolean));
+      newPosts=posts.map(p=>p.id===editPost.id?{...p,...form,slug}:p);
     }else{
-      newPosts=[{...form,id:Date.now()},...posts];
+      const slug=uniqueSlug(slugify(form.title),posts.map(p=>p.slug).filter(Boolean));
+      newPosts=[{...form,slug,id:Date.now()},...posts];
     }
     setModal(null);setEditPost(null);
     const msg=form.status==='published'?'✓ Článek publikován — projeví se do 1 hodiny.':'✓ Koncept uložen.';

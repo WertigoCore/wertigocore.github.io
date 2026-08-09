@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /config.local.php
+Disallow: /contact-error.log
+
+Sitemap: https://nova-design.cz/sitemap.xml

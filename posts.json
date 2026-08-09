@@ -1,6 +1,7 @@
 [
   {
     "id": 1,
+    "slug": "jak-optimalizovat-wordpress-pro-rychlost",
     "title": "Jak optimalizovat WordPress pro rychlost",
     "excerpt": "Praktický průvodce optimalizací — od výběru hostingu po lazyloading a cachování. Dosáhněte skóre 95+ v PageSpeed.",
     "category": "WordPress",
@@ -10,6 +11,7 @@
   },
   {
     "id": 2,
+    "slug": "zlata-hodinka-proc-fotografovat-pri-soumraku",
     "title": "Zlatá hodinka — proč fotografovat při soumraku",
     "excerpt": "Světlo ve zlaté hodince mění průměrnou fotografii v umělecké dílo. Tipy, jak ho využít naplno s jakýmkoli fotoaparátem.",
     "category": "Fotografie",
@@ -19,6 +21,7 @@
   },
   {
     "id": 3,
+    "slug": "joomla-vs-wordpress-v-roce-2026",
     "title": "Joomla vs WordPress v roce 2026",
     "excerpt": "Porovnání dvou CMS gigantů z pohledu vývojáře. Kdy sáhnout po Joomle a kdy zůstat u WordPress?",
     "category": "CMS",
